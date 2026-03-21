@@ -1,26 +1,116 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* === Fonts === */
+  --font-headline: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Lazydog", "Plus Jakarta Sans", sans-serif;
+  --font-body: "Work Sans", sans-serif;
+  --font-label: "Work Sans", sans-serif;
+
+  /* === Colors: Stitch Design System === */
+  --color-primary: #bb0006;
+  --color-primary-dim: #a40004;
+  --color-primary-container: #ff7765;
+  --color-primary-fixed: #ff7765;
+  --color-primary-fixed-dim: #ff5b4a;
+  --color-on-primary: #ffefed;
+  --color-on-primary-container: #4f0001;
+  --color-on-primary-fixed: #000000;
+  --color-on-primary-fixed-variant: #610001;
+
+  --color-secondary: #a03a0f;
+  --color-secondary-dim: #902e02;
+  --color-secondary-container: #ffc4b1;
+  --color-secondary-fixed: #ffc4b1;
+  --color-secondary-fixed-dim: #ffb196;
+  --color-on-secondary: #ffefeb;
+  --color-on-secondary-container: #832800;
+  --color-on-secondary-fixed: #621c00;
+  --color-on-secondary-fixed-variant: #922f03;
+
+  --color-tertiary: #b70049;
+  --color-tertiary-dim: #a1003f;
+  --color-tertiary-container: #ff8fa4;
+  --color-tertiary-fixed: #ff8fa4;
+  --color-tertiary-fixed-dim: #ff7794;
+  --color-on-tertiary: #ffeff0;
+  --color-on-tertiary-container: #670025;
+  --color-on-tertiary-fixed: #390011;
+  --color-on-tertiary-fixed-variant: #77002d;
+
+  --color-error: #b31b25;
+  --color-error-dim: #9f0519;
+  --color-error-container: #fb5151;
+  --color-on-error: #ffefee;
+  --color-on-error-container: #570008;
+
+  --color-surface: #ebf9ff;
+  --color-surface-dim: #bbd9e6;
+  --color-surface-bright: #ebf9ff;
+  --color-surface-container: #d4ecf7;
+  --color-surface-container-low: #def4fe;
+  --color-surface-container-high: #cce7f2;
+  --color-surface-container-highest: #c5e1ed;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-variant: #c5e1ed;
+  --color-surface-tint: #bb0006;
+
+  --color-on-surface: #1f3138;
+  --color-on-surface-variant: #4c5e66;
+  --color-on-background: #1f3138;
+  --color-background: #ebf9ff;
+
+  --color-outline: #677a82;
+  --color-outline-variant: #9db0b9;
+
+  --color-inverse-surface: #001017;
+  --color-inverse-on-surface: #8da0a8;
+  --color-inverse-primary: #ff5543;
+
+  /* === Border Radius === */
+  --radius-DEFAULT: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* === Custom Utilities === */
+.handwritten-tilt {
+  transform: rotate(-1.5deg);
+}
+
+.handwritten-tilt-alt {
+  transform: rotate(1deg);
+}
+
+.scrapbook-shadow {
+  box-shadow: 0 24px 48px -12px rgba(31, 49, 56, 0.06);
+}
+
+@font-face {
+  font-family: "Lazydog";
+  src: url("/lazy_dog.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-display {
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+}
+
+::selection {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
 }

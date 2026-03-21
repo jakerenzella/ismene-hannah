@@ -11,27 +11,13 @@ export default function OurStory() {
     <section className="bg-surface-container-low py-24" id="story">
       <div className="max-w-4xl mx-auto px-6 text-center">
         {/* Decorative stars + heart */}
-        <div className="mb-8 flex justify-center gap-4 items-center">
+        <div className="mb-8 flex justify-center">
           <Image
-            src="/assets/star.svg"
+            src="/assets/fish.svg"
             alt=""
-            width={64}
-            height={64}
-            className="w-16 h-16 opacity-60"
-          />
-          <Image
-            src="/assets/heart.svg"
-            alt=""
-            width={80}
-            height={80}
-            className="w-20 h-20 opacity-80"
-          />
-          <Image
-            src="/assets/star.svg"
-            alt=""
-            width={64}
-            height={64}
-            className="w-16 h-16 opacity-60"
+            width={240}
+            height={240}
+            className="w-60 h-60"
           />
         </div>
 

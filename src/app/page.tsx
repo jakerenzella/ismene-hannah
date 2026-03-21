@@ -14,27 +14,13 @@ export default function Home() {
         <OurStory />
         <Details />
         {/* Decorative break */}
-        <div className="py-12 flex justify-center gap-12 opacity-30">
+        <div className="py-12 flex justify-center">
           <Image
-            src="/assets/heart.svg"
+            src="/assets/sparkle.svg"
             alt=""
-            width={128}
-            height={128}
-            className="w-32 h-32"
-          />
-          <Image
-            src="/assets/star.svg"
-            alt=""
-            width={160}
-            height={160}
-            className="w-40 h-40"
-          />
-          <Image
-            src="/assets/heart.svg"
-            alt=""
-            width={128}
-            height={128}
-            className="w-32 h-32"
+            width={200}
+            height={200}
+            className="w-48 h-48"
           />
         </div>
       </main>

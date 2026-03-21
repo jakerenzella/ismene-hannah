@@ -94,11 +94,6 @@
   font-display: swap;
 }
 
-.font-display {
-  letter-spacing: 0.02em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 html {
   scroll-behavior: smooth;

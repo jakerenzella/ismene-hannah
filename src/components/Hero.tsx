@@ -6,11 +6,11 @@ export default function Hero() {
       <div className="relative flex flex-col md:flex-row items-center gap-12 py-12">
         {/* Text */}
         <div className="w-full md:w-1/2 z-10">
-          <div className="mb-6 handwritten-tilt">
+          <div className="mb-6 handwritten-tilt inline-flex flex-col items-center">
             <h1 className="font-display text-5xl md:text-7xl text-primary leading-tight tracking-tight">
               Ismene + Hannah
             </h1>
-            <p className="font-display text-2xl md:text-3xl text-primary/70 tracking-wide -mt-1 text-center">
+            <p className="font-display text-2xl md:text-3xl text-primary tracking-wide -mt-3">
               (are getting married)
             </p>
           </div>
@@ -35,7 +35,7 @@ export default function Hero() {
           </div>
 
           <div
-            className="rounded-xl scrapbook-shadow border-8 border-surface-container-lowest"
+            className="rounded-xl scrapbook-shadow"
             style={{ transform: "rotate(2deg)" }}
           >
             <Image

@@ -15,35 +15,39 @@ export default function Details() {
     <section className="py-24 px-6 max-w-7xl mx-auto" id="details">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Venue Card */}
-        <div className="md:col-span-2 bg-surface-container-lowest p-8 md:p-12 rounded-xl scrapbook-shadow flex flex-col md:flex-row gap-8 items-center border border-primary-container/10">
+        <div className="md:col-span-2 bg-surface-container-lowest p-8 md:p-12 rounded-xl scrapbook-shadow flex flex-col md:flex-row gap-8 items-start border border-primary-container/10">
           <div className="w-full md:w-1/2">
-            <div className="mb-4 text-secondary">
-              <span className="material-symbols-outlined text-4xl">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="material-symbols-outlined text-4xl text-secondary">
                 location_on
               </span>
+              <h3 className="font-display text-3xl font-bold text-primary">
+                The Celebration
+              </h3>
             </div>
-            <h3 className="font-display text-3xl font-bold text-primary mb-4">
-              The Celebration
-            </h3>
             <p className="text-lg text-on-surface-variant mb-6">
               Join us for an evening of dancing, dining, and joy at the
               Abbotsford Convent. We&apos;ve chosen this spot for its winding
               gardens and beautiful historic architecture.
             </p>
             <div className="space-y-2 font-headline font-semibold text-on-surface">
-              <p>Abbotsford Convent, Melbourne</p>
-              <p>Arrival: 4:30 PM</p>
+              <p>Abbotsford Convent</p>
+              <p>1 St Heliers St, Abbotsford VIC 3067</p>
+              <p className="mt-4">Arrival: 4:30 PM</p>
               <p>Ceremony: 5:00 PM</p>
             </div>
           </div>
-          <div className="w-full md:w-1/2 h-64 md:h-80 rounded-lg overflow-hidden border-4 border-surface-container bg-surface-container-high flex items-center justify-center">
-            <div className="text-center text-on-surface-variant p-8">
-              <span className="material-symbols-outlined text-6xl text-secondary mb-2 block">
-                church
-              </span>
-              <p className="font-headline font-semibold">Abbotsford Convent</p>
-              <p className="text-sm">1 St Heliers St, Abbotsford VIC 3067</p>
-            </div>
+          <div className="w-full md:w-1/2 h-64 md:h-80 rounded-lg overflow-hidden border-4 border-surface-container">
+            <iframe
+              src="https://www.google.com/maps?q=Abbotsford+Convent,+1+St+Heliers+St,+Abbotsford+VIC+3067,+Australia&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Abbotsford Convent Map"
+            />
           </div>
         </div>
 

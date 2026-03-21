@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Sticker from "@/components/Sticker";
 
 const milestones = [
   { icon: "restaurant", label: "First Date", detail: "Fitzroy, 2022" },
@@ -12,9 +12,8 @@ export default function OurStory() {
       <div className="max-w-4xl mx-auto px-6 text-center">
         {/* Decorative stars + heart */}
         <div className="mb-8 flex justify-center">
-          <Image
+          <Sticker
             src="/assets/fish.svg"
-            alt=""
             width={240}
             height={240}
             className="w-60 h-60"

@@ -87,6 +87,10 @@
 }
 
 
+.doodle-icon-primary {
+  filter: invert(11%) sepia(95%) saturate(7000%) hue-rotate(355deg) brightness(80%) contrast(115%);
+}
+
 .sticker-float {
   animation: float 6s ease-in-out infinite;
 }

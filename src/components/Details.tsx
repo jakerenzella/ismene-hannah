@@ -14,23 +14,16 @@ export default function Details() {
   return (
     <section className="py-32 px-6 max-w-7xl mx-auto relative" id="details">
       {/* Overlapping cloud sticker */}
-      <div className="absolute -top-16 right-10 text-tertiary-container/30 z-0">
-        <span
-          className="material-symbols-outlined text-[5120px]"
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          cloud
-        </span>
+      <div className="absolute -top-16 right-10 opacity-30 pointer-events-none z-0">
+        <Image src="/assets/cloud.svg" alt="" width={176} height={176} className="w-44 h-auto" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
         {/* Venue Card */}
         <div className="md:col-span-2 bg-surface-container-lowest p-8 md:p-14 rounded-3xl scrapbook-shadow flex flex-col lg:flex-row gap-10 items-center border border-primary-container/10">
           <div className="w-full lg:w-1/2">
-            <div className="mb-6 text-secondary">
-              <span className="material-symbols-outlined text-5xl">location_on</span>
-            </div>
-            <h3 className="font-display text-4xl font-bold text-primary mb-6">
+            <h3 className="font-display text-4xl font-bold text-primary mb-6 flex items-center gap-3">
+              <Image src="/assets/doodle/location-marker.svg" alt="" width={40} height={40} className="w-10 h-10 doodle-icon-primary" />
               The Celebration
             </h3>
             <p className="text-lg text-on-surface-variant mb-8 leading-relaxed">
@@ -92,12 +85,7 @@ export default function Details() {
 
             {submitted ? (
               <div className="py-8">
-                <span
-                  className="material-symbols-outlined text-5xl text-primary mb-4 block"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  favorite
-                </span>
+                <Image src="/assets/doodle/heart.svg" alt="" width={48} height={48} className="w-12 h-12 mb-4 mx-auto doodle-icon-primary" />
                 <p className="font-headline font-bold text-xl text-primary">
                   Thank you!
                 </p>
@@ -159,9 +147,7 @@ export default function Details() {
 
         {/* Registry Card */}
         <div className="bg-secondary-container/20 p-10 rounded-3xl scrapbook-shadow border-2 border-secondary-container/40 flex flex-col items-center justify-center text-center handwritten-tilt">
-          <span className="material-symbols-outlined text-secondary text-6xl mb-6">
-            card_giftcard
-          </span>
+          <Image src="/assets/doodle/shopping.svg" alt="" width={56} height={56} className="w-14 h-14 mb-6 doodle-icon-primary" />
           <h4 className="font-headline text-3xl font-bold text-secondary mb-4">
             Registry
           </h4>
@@ -181,9 +167,7 @@ export default function Details() {
         <div className="md:col-span-2 bg-surface-container/30 p-10 rounded-3xl scrapbook-shadow border border-outline-variant/10 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 gap-10 items-start">
           <div className="flex gap-5">
             <div className="bg-primary-container/30 p-4 rounded-2xl h-fit rotate-[-5deg]">
-              <span className="material-symbols-outlined text-primary text-3xl">
-                directions_car
-              </span>
+              <Image src="/assets/doodle/map.svg" alt="" width={56} height={56} className="w-14 h-14 doodle-icon-primary" />
             </div>
             <div>
               <h5 className="font-headline font-extrabold text-xl text-on-surface mb-2">
@@ -196,9 +180,7 @@ export default function Details() {
           </div>
           <div className="flex gap-5">
             <div className="bg-primary-container/30 p-4 rounded-2xl h-fit rotate-[8deg]">
-              <span className="material-symbols-outlined text-primary text-3xl">
-                local_bar
-              </span>
+              <Image src="/assets/doodle/tag.svg" alt="" width={56} height={56} className="w-14 h-14 doodle-icon-primary" />
             </div>
             <div>
               <h5 className="font-headline font-extrabold text-xl text-on-surface mb-2">

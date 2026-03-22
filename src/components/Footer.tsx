@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="w-full py-20 bg-surface-container-low/50 border-t border-primary-container/10 flex flex-col items-center gap-8 px-6 text-center">
@@ -27,7 +29,7 @@ export default function Footer() {
         className="mt-8 w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 hover:scale-110 transition-all shadow-lg shadow-primary/5"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
-        <span className="material-symbols-outlined text-3xl">arrow_upward</span>
+        <Image src="/assets/doodle/up-arrow.svg" alt="Scroll to top" width={28} height={28} className="w-7 h-7 doodle-icon-primary" />
       </button>
     </footer>
   );

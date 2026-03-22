@@ -95,7 +95,7 @@ export default function Sticker({
   return (
     <button
       onClick={handleClick}
-      className="cursor-pointer border-0 bg-transparent p-0 transition-transform hover:scale-110 active:scale-95"
+      className="border-0 bg-transparent p-0 transition-transform hover:scale-110 active:scale-95"
       aria-label="Click for confetti!"
     >
       <Image src={src} alt={alt} width={width} height={height} className={className} />

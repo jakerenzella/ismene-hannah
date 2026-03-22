@@ -4,12 +4,14 @@ import OurStory from "@/components/OurStory";
 import Details from "@/components/Details";
 import Footer from "@/components/Footer";
 import Sticker from "@/components/Sticker";
+import ScatteredStickers from "@/components/ScatteredStickers";
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      <main className="pt-12 overflow-x-hidden">
+      <ScatteredStickers />
+      <main className="pt-12 relative z-10 overflow-x-hidden">
         <Hero />
         <OurStory />
         <Details />

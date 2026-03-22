@@ -3,7 +3,7 @@
 @theme inline {
   /* === Fonts === */
   --font-headline: "Plus Jakarta Sans", sans-serif;
-  --font-display: "Lazydog", "Plus Jakarta Sans", sans-serif;
+  --font-display: "Caveat", "Plus Jakarta Sans", sans-serif;
   --font-body: "Work Sans", sans-serif;
   --font-label: "Work Sans", sans-serif;
 
@@ -79,11 +79,21 @@
 }
 
 .handwritten-tilt-alt {
-  transform: rotate(1deg);
+  transform: rotate(1.2deg);
 }
 
 .scrapbook-shadow {
-  box-shadow: 0 24px 48px -12px rgba(31, 49, 56, 0.06);
+  box-shadow: 0 24px 48px -12px rgba(31, 49, 56, 0.08);
+}
+
+
+.sticker-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--sticker-rotate, 0deg)); }
+  50% { transform: translateY(-10px) rotate(calc(var(--sticker-rotate, 0deg) + 2deg)); }
 }
 
 @font-face {
@@ -97,6 +107,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {

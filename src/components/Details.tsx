@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import DoodleIcon from "@/components/DoodleIcon";
 import { FormEvent, useState } from "react";
 
 export default function Details() {
@@ -23,7 +24,7 @@ export default function Details() {
         <div className="md:col-span-2 bg-surface-container-lowest p-8 md:p-14 rounded-3xl scrapbook-shadow flex flex-col lg:flex-row gap-10 items-center border border-primary-container/10">
           <div className="w-full lg:w-1/2">
             <h3 className="font-display text-4xl font-bold text-primary mb-6 flex items-center gap-3">
-              <Image src="/assets/doodle/location-marker.svg" alt="" width={40} height={40} className="w-10 h-10 doodle-icon-primary" />
+              <DoodleIcon name="location-marker" className="w-10 h-10 text-primary" />
               The Celebration
             </h3>
             <p className="text-lg text-on-surface-variant mb-8 leading-relaxed">
@@ -85,7 +86,7 @@ export default function Details() {
 
             {submitted ? (
               <div className="py-8">
-                <Image src="/assets/doodle/heart.svg" alt="" width={48} height={48} className="w-12 h-12 mb-4 mx-auto doodle-icon-primary" />
+                <DoodleIcon name="heart" className="w-12 h-12 mb-4 mx-auto text-primary" />
                 <p className="font-headline font-bold text-xl text-primary">
                   Thank you!
                 </p>
@@ -147,7 +148,7 @@ export default function Details() {
 
         {/* Registry Card */}
         <div className="bg-secondary-container/20 p-10 rounded-3xl scrapbook-shadow border-2 border-secondary-container/40 flex flex-col items-center justify-center text-center handwritten-tilt">
-          <Image src="/assets/doodle/shopping.svg" alt="" width={56} height={56} className="w-14 h-14 mb-6 doodle-icon-primary" />
+          <DoodleIcon name="shopping" className="w-14 h-14 mb-6 text-primary" />
           <h4 className="font-headline text-3xl font-bold text-secondary mb-4">
             Registry
           </h4>
@@ -164,29 +165,29 @@ export default function Details() {
         </div>
 
         {/* Logistics Card */}
-        <div className="md:col-span-2 bg-surface-container/30 p-10 rounded-3xl scrapbook-shadow border border-outline-variant/10 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 gap-10 items-start">
-          <div className="flex gap-5">
-            <div className="bg-primary-container/30 p-4 rounded-2xl h-fit rotate-[-5deg]">
-              <Image src="/assets/doodle/map.svg" alt="" width={56} height={56} className="w-14 h-14 doodle-icon-primary" />
+        <div className="md:col-span-2 bg-surface-container/30 p-8 rounded-3xl scrapbook-shadow border border-outline-variant/10 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
+          <div className="flex gap-4">
+            <div className="bg-primary-container/30 p-3 rounded-xl h-fit rotate-[-5deg]">
+              <DoodleIcon name="map" className="w-10 h-10 text-primary" />
             </div>
             <div>
-              <h5 className="font-headline font-extrabold text-xl text-on-surface mb-2">
+              <h5 className="font-headline font-extrabold text-lg text-on-surface mb-1">
                 Parking
               </h5>
-              <p className="text-on-surface-variant">
+              <p className="text-sm text-on-surface-variant">
                 Ample parking is available on-site at the convent main entrance.
               </p>
             </div>
           </div>
-          <div className="flex gap-5">
-            <div className="bg-primary-container/30 p-4 rounded-2xl h-fit rotate-[8deg]">
-              <Image src="/assets/doodle/tag.svg" alt="" width={56} height={56} className="w-14 h-14 doodle-icon-primary" />
+          <div className="flex gap-4">
+            <div className="bg-primary-container/30 p-3 rounded-xl h-fit rotate-[8deg]">
+              <DoodleIcon name="tag" className="w-10 h-10 text-primary" />
             </div>
             <div>
-              <h5 className="font-headline font-extrabold text-xl text-on-surface mb-2">
+              <h5 className="font-headline font-extrabold text-lg text-on-surface mb-1">
                 Attire
               </h5>
-              <p className="text-on-surface-variant">
+              <p className="text-sm text-on-surface-variant">
                 Cocktail attire. The ceremony is outdoors on grass, so choose
                 footwear accordingly!
               </p>

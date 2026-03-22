@@ -1,10 +1,11 @@
 import Image from "next/image";
 import FishSwarm from "@/components/FishSwarm";
+import DoodleIcon from "@/components/DoodleIcon";
 
 const milestones = [
-  { icon: "/assets/doodle/heart.svg", label: "First Date", detail: "Fitzroy, 2022" },
-  { icon: "/assets/doodle/home.svg", label: "New Home", detail: "Carlton, 2024" },
-  { icon: "/assets/doodle/medal.svg", label: "The Yes!", detail: "Botanic Gardens, 2026" },
+  { icon: "heart", label: "First Date", detail: "Fitzroy, 2022" },
+  { icon: "home", label: "New Home", detail: "Carlton, 2024" },
+  { icon: "medal", label: "The Yes!", detail: "Botanic Gardens, 2026" },
 ];
 
 export default function OurStory() {
@@ -45,7 +46,7 @@ export default function OurStory() {
                 i % 2 === 0 ? "handwritten-tilt" : "handwritten-tilt-alt"
               }`}
             >
-              <Image src={m.icon} alt="" width={40} height={40} className="w-10 h-10 mb-3 mx-auto doodle-icon-primary" />
+              <DoodleIcon name={m.icon} className="w-10 h-10 mb-3 mx-auto text-primary" />
               <p className="font-headline font-bold text-xl text-on-surface">
                 {m.label}
               </p>

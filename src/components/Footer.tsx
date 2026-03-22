@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import DoodleIcon from "@/components/DoodleIcon";
 
 export default function Footer() {
   return (
@@ -29,7 +29,7 @@ export default function Footer() {
         className="mt-8 w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 hover:scale-110 transition-all shadow-lg shadow-primary/5"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
-        <Image src="/assets/doodle/up-arrow.svg" alt="Scroll to top" width={28} height={28} className="w-7 h-7 doodle-icon-primary" />
+        <DoodleIcon name="up-arrow" className="w-7 h-7 text-primary" />
       </button>
     </footer>
   );

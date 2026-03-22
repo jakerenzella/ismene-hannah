@@ -11,7 +11,7 @@ export default function Home() {
     <>
       <Navbar />
       <ScatteredStickers />
-      <main className="pt-12 relative z-10 overflow-x-hidden">
+      <main className="pt-12 relative z-10">
         <Hero />
         <OurStory />
         <Details />

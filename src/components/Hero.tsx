@@ -8,10 +8,10 @@ export default function Hero() {
         {/* Text */}
         <div className="w-full md:w-1/2 z-10">
           <div className="mb-6 handwritten-tilt inline-flex flex-col">
-            <h1 id="hero-title" className="font-display text-5xl md:text-9xl text-primary leading-24 tracking-tight font-bold">
+            <h1 id="hero-title" className="font-display text-5xl md:text-9xl text-primary leading-tight md:leading-24 tracking-tight font-bold">
               Ismene + Hannah
             </h1>
-            <p className="font-display text-3xl md:text-4xl text-primary tracking-wide mt-3 ml-6">
+            <p className="font-display text-3xl md:text-4xl text-primary tracking-wide mt-0 md:mt-3 ml-6">
               (are getting married)
             </p>
           </div>

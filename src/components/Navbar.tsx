@@ -7,7 +7,6 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm shadow-surface-container/50">
-
       <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
         <a
           className="text-2xl font-bold tracking-tighter text-primary font-headline"

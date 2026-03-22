@@ -54,7 +54,7 @@ function createConfettiPiece(x: number, y: number) {
 
   function animate(now: number) {
     const t = (now - start) / duration;
-    if (t >= 1) {
+    if (t >= 1 || now - start > 3000) {
       el.remove();
       return;
     }

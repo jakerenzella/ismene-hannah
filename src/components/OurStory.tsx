@@ -11,7 +11,7 @@ export default function OurStory() {
     <section className="bg-surface-container-low/50 py-32 relative" id="story">
       {/* Peek-in sticker */}
       <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-primary-container/40">
-        <span className="material-symbols-outlined text-[2560px]">set_meal</span>
+        <span className="material-symbols-outlined text-[2560px]" style={{ fontVariationSettings: "'FILL' 1" }}>set_meal</span>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 text-center relative z-10">

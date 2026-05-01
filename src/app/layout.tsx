@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Ismene + Hannah | 27.07.27",
+  metadataBase: new URL(siteUrl),
+  title: "Ismene + Hannah's Wedding — 27 July 2027 in Melbourne",
   description:
-    "Join us for our wedding celebration on 27 July 2027 in Melbourne.",
+    "Ismene & Hannah are tying the knot in Melbourne on 27 July 2027. Join us for an evening of dancing, dining, and joy at the Abbotsford Convent.",
 };
 
 export default function RootLayout({

@@ -22,6 +22,8 @@ If something looks different to what's described here (a missing column, a missi
 
 **Settings** — site-wide settings (currently just the RSVP deadline date). One row, edit it directly.
 
+**Notes** — public notes wall. Guests post sweet messages here through the website (one row per note). You can hide any note by ticking its `Hidden` checkbox.
+
 The Invitees and RSVPs tables are linked: each RSVP knows which Invitee it belongs to.
 
 ---
@@ -86,7 +88,18 @@ Open the **Settings** table → edit the `RSVP deadline` field on the single row
 
 You can extend or shorten the deadline at any time by changing this one field.
 
-### 7. Manually add an RSVP (e.g. someone called you)
+### 7. Moderate a note on the wall
+
+Open the **Notes** table. Each row is a guest's message. To hide a note from the public wall:
+
+- Tick its `Hidden` checkbox. The note disappears from the website immediately on next page load (no need to delete).
+- Untick to bring it back.
+
+To delete entirely: select the row and press Delete. This is permanent.
+
+The author can also delete their own notes from the website. Each invitee can have up to 3 notes at once; once they hit the limit they'll need to delete one of theirs to leave another.
+
+### 8. Manually add an RSVP (e.g. someone called you)
 
 Easiest path: ask them their answers, then submit the form for them on your phone using their invite link. The website fills it into Airtable just like a normal RSVP.
 

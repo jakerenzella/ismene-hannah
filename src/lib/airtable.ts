@@ -1,4 +1,5 @@
 import type { Invitee, RsvpInput } from "./rsvp-schema";
+import type { NoteColor, NoteInput, ReactionType } from "./notes-schema";
 
 const AIRTABLE_API_BASE = "https://api.airtable.com/v0";
 
@@ -13,6 +14,7 @@ type InviteeFields = {
   Household: string;
   "Max party size"?: number;
   Email?: string;
+  "Sardine clicks"?: number;
 };
 
 type RsvpFields = {
@@ -75,6 +77,158 @@ export async function updateInviteeEmail(inviteeId: string, email: string): Prom
   await airtableFetch(`${tableUrl(table)}/${inviteeId}`, {
     method: "PATCH",
     body: JSON.stringify({ fields: { Email: email } }),
+  });
+}
+
+/**
+ * Read-then-PATCH increment of the "Sardine clicks" counter on an Invitee.
+ * Airtable has no atomic increment; concurrent updates may lose a tick. That's
+ * acceptable for a fun click counter — we just want a rough leaderboard.
+ */
+// ============================================================
+// Notes
+// ============================================================
+
+type NoteFields = {
+  "Author name": string;
+  Message: string;
+  Color: NoteColor;
+  Invitee: string[];
+  "Submitted at"?: string;
+  Hidden?: boolean;
+  "Heart count"?: number;
+  "Sparkle count"?: number;
+  "Laugh count"?: number;
+};
+
+export type Note = {
+  id: string;
+  authorName: string;
+  message: string;
+  color: NoteColor;
+  submittedAt: string | null;
+  hearts: number;
+  sparkles: number;
+  laughs: number;
+  /** True when this note is linked to the viewer's invitee. Used to gate delete UI. */
+  mine: boolean;
+};
+
+function parseNoteRecord(
+  record: AirtableRecord<NoteFields>,
+  myInviteeId: string | null
+): Note {
+  return {
+    id: record.id,
+    authorName: record.fields["Author name"] ?? "",
+    message: record.fields.Message ?? "",
+    color: record.fields.Color,
+    submittedAt: record.fields["Submitted at"] ?? record.createdTime ?? null,
+    hearts: record.fields["Heart count"] ?? 0,
+    sparkles: record.fields["Sparkle count"] ?? 0,
+    laughs: record.fields["Laugh count"] ?? 0,
+    mine: !!myInviteeId && (record.fields.Invitee ?? []).includes(myInviteeId),
+  };
+}
+
+/**
+ * Returns visible notes (Hidden != true), newest first.
+ * If `myInviteeId` is provided, each note is tagged with `mine: true`
+ * when it's linked to that invitee, so the UI can show delete controls.
+ */
+export async function getNotes(myInviteeId: string | null = null): Promise<Note[]> {
+  const table = process.env.AIRTABLE_NOTES_TABLE;
+  if (!table) return [];
+  const formula = encodeURIComponent("NOT({Hidden})");
+  const sort = "sort%5B0%5D%5Bfield%5D=Submitted%20at&sort%5B0%5D%5Bdirection%5D=desc";
+  const url = `${tableUrl(table)}?filterByFormula=${formula}&pageSize=100&${sort}`;
+  const response = await airtableFetch(url);
+  const data = (await response.json()) as { records: AirtableRecord<NoteFields>[] };
+  return data.records.map((r) => parseNoteRecord(r, myInviteeId));
+}
+
+export async function getNoteCountForInvitee(inviteeId: string): Promise<number> {
+  const table = process.env.AIRTABLE_NOTES_TABLE;
+  if (!table) return 0;
+  const formula = encodeURIComponent(`AND(NOT({Hidden}), FIND("${inviteeId.replace(/"/g, "")}", ARRAYJOIN({Invitee})))`);
+  const url = `${tableUrl(table)}?filterByFormula=${formula}&pageSize=100&fields%5B%5D=Invitee`;
+  const response = await airtableFetch(url);
+  const data = (await response.json()) as { records: AirtableRecord<NoteFields>[] };
+  return data.records.length;
+}
+
+export async function createNote(
+  inviteeId: string,
+  payload: Pick<NoteInput, "authorName" | "message" | "color">
+): Promise<Note> {
+  const table = env("AIRTABLE_NOTES_TABLE");
+  const fields: NoteFields = {
+    "Author name": payload.authorName,
+    Message: payload.message,
+    Color: payload.color,
+    Invitee: [inviteeId],
+  };
+  // typecast: true tells Airtable to create missing single-select options on the
+  // fly and accept case-insensitive matches, so the form doesn't break if the
+  // host hasn't pre-created every Color option in the schema.
+  const response = await airtableFetch(tableUrl(table), {
+    method: "POST",
+    body: JSON.stringify({ fields, typecast: true }),
+  });
+  const data = (await response.json()) as AirtableRecord<NoteFields>;
+  return parseNoteRecord(data, inviteeId);
+}
+
+export async function getNoteOwnerInviteeId(noteId: string): Promise<string | null> {
+  const table = env("AIRTABLE_NOTES_TABLE");
+  const response = await airtableFetch(`${tableUrl(table)}/${noteId}`);
+  const data = (await response.json()) as AirtableRecord<NoteFields>;
+  return data.fields.Invitee?.[0] ?? null;
+}
+
+export async function deleteNote(noteId: string): Promise<void> {
+  const table = env("AIRTABLE_NOTES_TABLE");
+  await airtableFetch(`${tableUrl(table)}/${noteId}`, { method: "DELETE" });
+}
+
+const REACTION_FIELD: Record<ReactionType, "Heart count" | "Sparkle count" | "Laugh count"> = {
+  heart: "Heart count",
+  sparkle: "Sparkle count",
+  laugh: "Laugh count",
+};
+
+export async function adjustNoteReaction(
+  noteId: string,
+  type: ReactionType,
+  delta: number
+): Promise<void> {
+  if (delta === 0) return;
+  const table = env("AIRTABLE_NOTES_TABLE");
+  const url = `${tableUrl(table)}/${noteId}`;
+  const getRes = await airtableFetch(url);
+  const data = (await getRes.json()) as AirtableRecord<NoteFields>;
+  const field = REACTION_FIELD[type];
+  const current = data.fields[field] ?? 0;
+  const next = Math.max(0, current + delta);
+  await airtableFetch(url, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: { [field]: next } }),
+  });
+}
+
+export async function incrementInviteeSardineClicks(
+  inviteeId: string,
+  delta: number
+): Promise<void> {
+  if (delta <= 0) return;
+  const table = env("AIRTABLE_INVITEES_TABLE");
+  const url = `${tableUrl(table)}/${inviteeId}`;
+  const getRes = await airtableFetch(url);
+  const data = (await getRes.json()) as AirtableRecord<InviteeFields>;
+  const current = data.fields["Sardine clicks"] ?? 0;
+  await airtableFetch(url, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: { "Sardine clicks": current + delta } }),
   });
 }
 
@@ -158,6 +312,37 @@ type SettingsFields = {
   "RSVP deadline"?: string;
 };
 
+export const WEDDING_TIMEZONE = "Australia/Melbourne";
+
+/**
+ * Returns the offset between the given timezone and UTC at the given instant,
+ * in milliseconds (positive east of UTC). Uses Intl so DST is handled correctly.
+ */
+function offsetMsInTimezone(date: Date, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    timeZoneName: "longOffset",
+  }).formatToParts(date);
+  const tzName = parts.find((p) => p.type === "timeZoneName")?.value ?? "GMT";
+  const match = tzName.match(/GMT([+-])(\d{1,2}):?(\d{2})?/);
+  if (!match) return 0;
+  const sign = match[1] === "+" ? 1 : -1;
+  const hours = parseInt(match[2] ?? "0", 10);
+  const mins = parseInt(match[3] ?? "0", 10);
+  return sign * (hours * 60 + mins) * 60 * 1000;
+}
+
+/**
+ * Treats `dateStr` (YYYY-MM-DD) as a wall-clock date in the wedding timezone and
+ * returns the absolute instant of 23:59:59.999 on that date in that zone. The
+ * server's own timezone is irrelevant.
+ */
+export function endOfWeddingDay(dateStr: string): Date {
+  const naive = new Date(`${dateStr.slice(0, 10)}T23:59:59.999Z`);
+  const offsetMs = offsetMsInTimezone(naive, WEDDING_TIMEZONE);
+  return new Date(naive.getTime() - offsetMs);
+}
+
 /**
  * Reads site-wide settings from the Airtable Settings table (single row).
  * Fail-open: any error or missing config returns a permissive default,
@@ -174,9 +359,7 @@ export async function getSettings(): Promise<Settings> {
     const data = (await response.json()) as { records: AirtableRecord<SettingsFields>[] };
     const dateStr = data.records[0]?.fields["RSVP deadline"];
     if (!dateStr) return { rsvpDeadline: null };
-    // Treat the deadline as end-of-day UTC: "2027-06-01" → 2027-06-01T23:59:59Z.
-    // Close enough for a wedding deadline; submissions made on the day are accepted.
-    const deadline = new Date(`${dateStr.slice(0, 10)}T23:59:59Z`);
+    const deadline = endOfWeddingDay(dateStr);
     return { rsvpDeadline: Number.isNaN(deadline.getTime()) ? null : deadline };
   } catch (error) {
     console.error("[settings] fetch failed", error);

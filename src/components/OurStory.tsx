@@ -8,13 +8,13 @@ const milestones = [
   { icon: "medal", label: "The Yes!", detail: "Botanic Gardens, 2026" },
 ];
 
-export default function OurStory() {
+export default function OurStory({ code }: { code: string | null }) {
   return (
-    <section className="bg-surface-container-low/50 py-16 relative" id="story">
+    <section className="bg-surface-container-low/50 py-16 relative scroll-mt-24" id="story">
       <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
         {/* Decorative fish */}
         <div className="mb-8 flex justify-center">
-          <FishSwarm>
+          <FishSwarm code={code}>
             <Image src="/assets/fish.svg" alt="" width={240} height={240} className="w-60 h-60" />
           </FishSwarm>
         </div>

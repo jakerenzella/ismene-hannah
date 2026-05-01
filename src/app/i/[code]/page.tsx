@@ -84,7 +84,7 @@ function InviteFrame({ children }: { children: React.ReactNode }) {
           }
         >
           <Image
-            src="/assets/glitter-heart.svg"
+            src="/assets/heart_2.svg"
             alt=""
             width={140}
             height={140}

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface SwimmingFish {
@@ -17,10 +17,48 @@ interface SwimmingFish {
 
 let fishId = 0;
 
-export default function FishSwarm({ children }: { children: React.ReactNode }) {
+export default function FishSwarm({
+  children,
+  code,
+}: {
+  children: React.ReactNode;
+  code: string | null;
+}) {
   const [fish, setFish] = useState<SwimmingFish[]>([]);
+  const pendingClicksRef = useRef(0);
+
+  // Periodic + lifecycle flush of pending click counts to /api/sardine.
+  useEffect(() => {
+    if (!code) return;
+
+    function flush(useKeepalive: boolean) {
+      const pending = pendingClicksRef.current;
+      if (pending <= 0) return;
+      pendingClicksRef.current = 0;
+      fetch("/api/sardine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, count: pending }),
+        keepalive: useKeepalive,
+      }).catch((error) => {
+        console.error("[sardine] flush failed", error);
+      });
+    }
+
+    const interval = setInterval(() => flush(false), 3000);
+    const handlePageHide = () => flush(true);
+    window.addEventListener("pagehide", handlePageHide);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("pagehide", handlePageHide);
+      flush(true); // last attempt on unmount / HMR
+    };
+  }, [code]);
 
   const spawnFish = useCallback(() => {
+    if (code) pendingClicksRef.current += 1;
+
     const newFish: SwimmingFish[] = [];
     const count = 8 + Math.floor(Math.random() * 7);
 
@@ -38,7 +76,7 @@ export default function FishSwarm({ children }: { children: React.ReactNode }) {
     }
 
     setFish((prev) => [...prev, ...newFish]);
-  }, []);
+  }, [code]);
 
   const removeFish = useCallback((id: number) => {
     setFish((prev) => prev.filter((f) => f.id !== id));

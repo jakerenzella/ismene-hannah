@@ -2,17 +2,23 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import OurStory from "@/components/OurStory";
 import Details from "@/components/Details";
+import Notes from "@/components/Notes";
 import Footer from "@/components/Footer";
 import Sticker from "@/components/Sticker";
 import ScatteredStickers from "@/components/ScatteredStickers";
 import {
   getExistingRsvpByCode,
   getInviteeByCode,
+  getNotes,
   getSettings,
   isPastDeadline,
+  WEDDING_TIMEZONE,
   type ExistingRsvp,
+  type Note,
 } from "@/lib/airtable";
 import { INVITE_CODE_REGEX, type Invitee } from "@/lib/rsvp-schema";
+
+export const dynamic = "force-dynamic";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -50,13 +56,24 @@ const deadlineFormatter = new Intl.DateTimeFormat("en-AU", {
   day: "numeric",
   month: "long",
   year: "numeric",
+  timeZone: WEDDING_TIMEZONE,
 });
+
+async function safeGetNotes(myInviteeId: string | null): Promise<Note[]> {
+  try {
+    return await getNotes(myInviteeId);
+  } catch (error) {
+    console.error("[page] notes lookup failed", error);
+    return [];
+  }
+}
 
 export default async function Home({ searchParams }: { searchParams: SearchParams }) {
   const [{ invitee, invalidCode, existingRsvp }, settings] = await Promise.all([
     resolveInvitee(searchParams),
     getSettings(),
   ]);
+  const notes = invitee ? await safeGetNotes(invitee.id) : [];
 
   const rsvpClosed = isPastDeadline(settings.rsvpDeadline);
   const deadlineLabel = settings.rsvpDeadline
@@ -65,11 +82,11 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
   return (
     <>
-      <Navbar />
+      <Navbar showNotes={!!invitee} />
       <ScatteredStickers />
       <main className="pt-12 relative z-10">
         <Hero />
-        <OurStory />
+        <OurStory code={invitee?.code ?? null} />
         <Details
           invitee={invitee}
           invalidCode={invalidCode}
@@ -77,6 +94,14 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           rsvpClosed={rsvpClosed}
           deadlineLabel={deadlineLabel}
         />
+        {invitee && (
+          <Notes
+            notes={notes}
+            code={invitee.code}
+            household={invitee.household}
+            hasRsvp={existingRsvp !== null}
+          />
+        )}
         <div className="py-12 flex justify-center">
           <Sticker
             src="/assets/sparkle.svg"

@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import DoodleIcon from "@/components/DoodleIcon";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { submitRsvp } from "@/app/actions/rsvp";
-import { initialRsvpState } from "@/app/actions/rsvp-state";
+import { initialRsvpState, type RsvpState } from "@/app/actions/rsvp-state";
 import type { ExistingRsvp } from "@/lib/airtable";
 import type { Invitee } from "@/lib/rsvp-schema";
 
@@ -27,13 +28,34 @@ export default function Details({
   deadlineLabel,
 }: Props) {
   return (
-    <section className="py-32 px-6 max-w-7xl mx-auto relative" id="details">
+    <section className="py-32 px-6 max-w-7xl mx-auto relative">
       <div className="absolute -top-16 right-10 opacity-30 pointer-events-none z-0">
         <Image src="/assets/cloud.svg" alt="" width={176} height={176} className="w-44 h-auto" />
       </div>
 
+      {/* RSVP — the most important card on the site, given prime real estate */}
+      <div
+        className="relative z-10 max-w-3xl mx-auto bg-surface-container-highest p-8 md:p-14 rounded-3xl scrapbook-shadow border-2 border-dashed border-primary/30 handwritten-tilt-alt mb-16 md:mb-20 scroll-mt-24"
+        id="rsvp"
+      >
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10 w-28 opacity-80 pointer-events-none">
+          <Image src="/assets/tape.svg" alt="" width={200} height={100} className="w-full h-auto" />
+        </div>
+        <RsvpCard
+          invitee={invitee}
+          invalidCode={invalidCode}
+          existingRsvp={existingRsvp}
+          rsvpClosed={rsvpClosed}
+          deadlineLabel={deadlineLabel}
+        />
+      </div>
+
+      {/* Secondary details */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10 items-stretch">
-        <div className="md:col-span-2 bg-surface-container-lowest p-8 md:p-14 rounded-3xl scrapbook-shadow flex flex-col lg:flex-row gap-10 items-center border border-primary-container/10">
+        <div
+          id="details"
+          className="md:col-span-3 bg-surface-container-lowest p-8 md:p-14 rounded-3xl scrapbook-shadow flex flex-col lg:flex-row gap-10 items-center border border-primary-container/10 scroll-mt-24"
+        >
           <div className="w-full lg:w-1/2">
             <h3 className="font-display text-4xl font-bold text-primary mb-6 flex items-center gap-3">
               <DoodleIcon name="location-marker" className="w-10 h-10 text-primary" />
@@ -70,39 +92,6 @@ export default function Details({
               title="Abbotsford Convent Map"
             />
           </div>
-        </div>
-
-        <div
-          className="md:row-span-2 bg-surface-container-highest p-10 md:p-12 rounded-3xl scrapbook-shadow relative border-2 border-dashed border-primary/30 handwritten-tilt-alt h-full"
-          id="rsvp"
-        >
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10 w-24 opacity-80">
-            <Image src="/assets/tape.svg" alt="" width={200} height={100} className="w-full h-auto" />
-          </div>
-          <RsvpCard
-            invitee={invitee}
-            invalidCode={invalidCode}
-            existingRsvp={existingRsvp}
-            rsvpClosed={rsvpClosed}
-            deadlineLabel={deadlineLabel}
-          />
-        </div>
-
-        <div className="md:col-span-2 bg-secondary-container/20 p-10 rounded-3xl scrapbook-shadow border-2 border-secondary-container/40 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left handwritten-tilt">
-          <DoodleIcon name="shopping" className="w-14 h-14 text-primary shrink-0" />
-          <div className="flex-1">
-            <h4 className="font-headline text-3xl font-bold text-secondary mb-2">Registry</h4>
-            <p className="text-on-secondary-container text-lg leading-relaxed">
-              Your presence is our greatest gift, but if you&apos;d like to contribute to our
-              future...
-            </p>
-          </div>
-          <a
-            className="text-secondary font-extrabold text-xl underline hover:text-primary transition-colors decoration-2 underline-offset-4 shrink-0"
-            href="#"
-          >
-            View Registry
-          </a>
         </div>
 
         <div className="md:col-span-3 bg-surface-container/30 p-8 rounded-3xl scrapbook-shadow border border-outline-variant/10 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
@@ -199,7 +188,18 @@ function RsvpForm({
   existingRsvp: ExistingRsvp | null;
   deadlineLabel: string | null;
 }) {
+  const router = useRouter();
   const [state, action, pending] = useActionState(submitRsvp, initialRsvpState);
+  // Refresh server data once after a successful RSVP so downstream sections
+  // (the Notes composer, in particular) see the new RSVP and unlock without
+  // requiring the guest to reload the page.
+  const lastRefreshedRef = useRef<RsvpState | null>(null);
+  useEffect(() => {
+    if (state.status === "ok" && lastRefreshedRef.current !== state) {
+      lastRefreshedRef.current = state;
+      router.refresh();
+    }
+  }, [state, router]);
   const initialAttending: "yes" | "no" | null = existingRsvp
     ? existingRsvp.attending
       ? "yes"
@@ -217,6 +217,7 @@ function RsvpForm({
   );
   const [email, setEmail] = useState<string>(existingRsvp?.email ?? "");
   const [dietary, setDietary] = useState<string>(existingRsvp?.dietary ?? "");
+  const [editing, setEditing] = useState<boolean>(!existingRsvp);
 
   function setAttendeeAt(index: number, value: string) {
     setAttendees((prev) => {
@@ -231,12 +232,29 @@ function RsvpForm({
       <div className="text-center py-8">
         <DoodleIcon name="heart" className="w-12 h-12 mb-4 mx-auto text-primary" />
         <p className="font-headline font-bold text-xl text-primary">Thank you!</p>
-        <p className="text-on-surface-variant mt-2">
+        <p className="text-on-surface-variant mt-2 mb-8">
           {state.mode === "updated"
             ? "We've updated your RSVP."
             : "We can't wait to celebrate with you."}
         </p>
+        <a
+          href="#notes"
+          className="inline-flex items-center justify-center gap-2 bg-primary-container/40 text-on-surface font-headline font-extrabold py-3 px-6 rounded-full hover:scale-[1.03] active:scale-95 transition-all text-base border-2 border-primary/20"
+        >
+          Leave a note for us
+          <span className="material-symbols-outlined text-lg">arrow_downward</span>
+        </a>
       </div>
+    );
+  }
+
+  if (existingRsvp && !editing) {
+    return (
+      <RsvpSummary
+        existingRsvp={existingRsvp}
+        deadlineLabel={deadlineLabel}
+        onEdit={() => setEditing(true)}
+      />
     );
   }
 
@@ -247,20 +265,14 @@ function RsvpForm({
 
   return (
     <div className="text-center">
-      <h3 className="font-display text-4xl font-bold text-primary mb-3">Are you coming?</h3>
-      <p className="text-on-surface-variant mb-2 text-lg">
-        Hi {invitee.household} —{" "}
-        {deadlineLabel ? `please let us know by ${deadlineLabel}.` : "please let us know."}
-      </p>
-
-      {existingRsvp && (
-        <div className="mt-6 mb-2 mx-auto max-w-sm bg-surface-container-low border border-primary/20 rounded-2xl px-5 py-4 text-left flex items-start gap-3">
-          <DoodleIcon name="heart" className="w-6 h-6 text-primary mt-0.5 shrink-0" />
-          <p className="text-sm text-on-surface-variant leading-relaxed">
-            <span className="font-headline font-bold text-on-surface">You&apos;ve already RSVP&apos;d.</span>{" "}
-            Make any changes below and resubmit to update your response.
-          </p>
-        </div>
+      <h3 className="font-display text-4xl md:text-5xl font-bold text-primary mb-3">
+        {existingRsvp ? "Update your RSVP" : "Are you coming?"}
+      </h3>
+      {!existingRsvp && (
+        <p className="text-on-surface-variant mb-2 text-lg">
+          Hi {invitee.household} —{" "}
+          {deadlineLabel ? `please let us know by ${deadlineLabel}.` : "please let us know."}
+        </p>
       )}
 
       <form className="space-y-6 text-left mt-8" action={action} noValidate>
@@ -303,7 +315,6 @@ function RsvpForm({
           <Field
             label="How many will attend?"
             hint={`Your invite covers up to ${invitee.maxPartySize} ${invitee.maxPartySize === 1 ? "person" : "people"}.`}
-            error={fieldErrors.attendees?.[0]}
           >
             <PartySizePills
               max={invitee.maxPartySize}
@@ -324,7 +335,13 @@ function RsvpForm({
             }
             error={fieldErrors.attendees?.[0]}
           >
-            <div className="space-y-3">
+            <div
+              className={
+                cappedPartySize > 1
+                  ? "grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3"
+                  : "space-y-3"
+              }
+            >
               {nameSlots.map((index) => (
                 <input
                   key={index}
@@ -349,40 +366,46 @@ function RsvpForm({
           </Field>
         )}
 
-        <Field
-          label="Email"
-          hint={
-            attending === "no"
-              ? "Optional — we'll only use this if we need to follow up."
-              : "So we can send confirmation and event updates."
+        <div
+          className={
+            showAttendeeFields ? "grid grid-cols-1 md:grid-cols-2 gap-6" : ""
           }
-          error={fieldErrors.email?.[0]}
         >
-          <input
-            className={inputClasses}
-            placeholder="you@example.com"
-            type="email"
-            name="email"
-            maxLength={320}
-            required={showAttendeeFields}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Field>
-
-        {showAttendeeFields && (
-          <Field label="Dietary requirements" error={fieldErrors.dietary?.[0]}>
-            <textarea
-              className={`${inputClasses} resize-none`}
-              placeholder="Allergies, intolerances, or preferences (optional)"
-              name="dietary"
-              maxLength={1000}
-              rows={2}
-              value={dietary}
-              onChange={(e) => setDietary(e.target.value)}
+          <Field
+            label="Email"
+            hint={
+              attending === "no"
+                ? "Optional — we'll only use this if we need to follow up."
+                : "So we can send confirmation and event updates."
+            }
+            error={fieldErrors.email?.[0]}
+          >
+            <input
+              className={inputClasses}
+              placeholder="you@example.com"
+              type="email"
+              name="email"
+              maxLength={320}
+              required={showAttendeeFields}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </Field>
-        )}
+
+          {showAttendeeFields && (
+            <Field label="Dietary requirements" error={fieldErrors.dietary?.[0]}>
+              <textarea
+                className={`${inputClasses} resize-none`}
+                placeholder="Allergies, intolerances, or preferences (optional)"
+                name="dietary"
+                maxLength={1000}
+                rows={2}
+                value={dietary}
+                onChange={(e) => setDietary(e.target.value)}
+              />
+            </Field>
+          )}
+        </div>
 
         {state.status === "error" && state.code !== "VALIDATION" && (
           <p className="text-red-700 text-sm" role="alert" aria-live="polite">
@@ -474,6 +497,83 @@ function PartySizePills({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function RsvpSummary({
+  existingRsvp,
+  deadlineLabel,
+  onEdit,
+}: {
+  existingRsvp: ExistingRsvp;
+  deadlineLabel: string | null;
+  onEdit: () => void;
+}) {
+  const guestWord = existingRsvp.attendees.length === 1 ? "guest" : "guests";
+  return (
+    <div className="text-center">
+      <h3 className="font-display text-4xl md:text-5xl font-bold text-primary mb-3">
+        Your RSVP
+      </h3>
+      <p className="text-on-surface-variant text-lg mb-8">
+        You&apos;ve already RSVP&apos;d
+        {deadlineLabel ? ` — you can update your response any time before ${deadlineLabel}.` : "."}
+      </p>
+
+      <div className="mx-auto max-w-md bg-surface-container-low border border-primary/20 rounded-2xl p-6 text-left">
+        {existingRsvp.attending ? (
+          <>
+            <div className="flex items-baseline gap-2 mb-4">
+              <span className="font-headline font-extrabold text-on-surface text-xl">
+                Attending
+              </span>
+              <span className="text-on-surface-variant text-sm">
+                · {existingRsvp.attendees.length} {guestWord}
+              </span>
+            </div>
+            {existingRsvp.attendees.length > 0 && (
+              <ul className="space-y-1 mb-4">
+                {existingRsvp.attendees.map((name, i) => (
+                  <li key={i} className="flex items-center gap-2 text-on-surface">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        ) : (
+          <p className="font-headline font-extrabold text-on-surface text-xl mb-4">
+            Not attending
+          </p>
+        )}
+        {existingRsvp.email && (
+          <p className="text-sm text-on-surface-variant break-all">
+            <span className="font-headline font-bold uppercase tracking-wider text-xs text-on-surface-variant/80 mr-2">
+              Email
+            </span>
+            {existingRsvp.email}
+          </p>
+        )}
+        {existingRsvp.dietary && (
+          <p className="text-sm text-on-surface-variant mt-2">
+            <span className="font-headline font-bold uppercase tracking-wider text-xs text-on-surface-variant/80 mr-2">
+              Dietary
+            </span>
+            {existingRsvp.dietary}
+          </p>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={onEdit}
+        className="mt-8 inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-headline font-extrabold py-4 px-10 rounded-full shadow-xl hover:scale-[1.03] active:scale-95 transition-all text-lg"
+      >
+        Edit RSVP
+        <span className="material-symbols-outlined">edit</span>
+      </button>
     </div>
   );
 }

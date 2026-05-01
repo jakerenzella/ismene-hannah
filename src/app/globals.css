@@ -96,6 +96,17 @@
   50% { transform: translateY(-10px) rotate(calc(var(--sticker-rotate, 0deg) + 2deg)); }
 }
 
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*="animation: marquee"] {
+    animation: none !important;
+  }
+}
+
 @font-face {
   font-family: "Lazydog";
   src: url("/lazy_dog.ttf") format("truetype");

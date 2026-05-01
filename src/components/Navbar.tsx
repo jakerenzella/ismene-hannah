@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import BackgroundMusic from "@/components/BackgroundMusic";
 
-export default function Navbar() {
+export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -36,16 +37,28 @@ export default function Navbar() {
           >
             RSVP
           </a>
+          {showNotes && (
+            <a
+              className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
+              href="#notes"
+            >
+              Notes wall
+            </a>
+          )}
+          <BackgroundMusic />
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          className="md:hidden text-primary text-2xl"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? "\u2715" : "\u2630"}
-        </button>
+        {/* Mobile controls */}
+        <div className="md:hidden flex items-center gap-2">
+          <BackgroundMusic />
+          <button
+            className="text-primary text-2xl p-2"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? "\u2715" : "\u2630"}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -72,6 +85,15 @@ export default function Navbar() {
           >
             RSVP
           </a>
+          {showNotes && (
+            <a
+              className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors"
+              href="#notes"
+              onClick={() => setMenuOpen(false)}
+            >
+              Notes wall
+            </a>
+          )}
         </div>
       )}
     </nav>

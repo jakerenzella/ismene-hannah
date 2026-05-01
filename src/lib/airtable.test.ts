@@ -199,6 +199,171 @@ describe("getExistingRsvpByCode", () => {
   });
 });
 
+describe("Notes", () => {
+  beforeEach(() => {
+    process.env.AIRTABLE_NOTES_TABLE = "Notes";
+  });
+
+  it("creates a note linked to the invitee", async () => {
+    const fetchMock = mockFetchSequence([
+      {
+        body: {
+          id: "rec_note_1",
+          fields: {
+            "Author name": "Aunt Sue",
+            Message: "wishing you the best",
+            Color: "Pink",
+            Invitee: ["rec_invitee_1"],
+          },
+        },
+      },
+    ]);
+    const { createNote } = await import("./airtable");
+    const note = await createNote("rec_invitee_1", {
+      authorName: "Aunt Sue",
+      message: "wishing you the best",
+      color: "Pink",
+    });
+    expect(note.authorName).toBe("Aunt Sue");
+    expect(note.color).toBe("Pink");
+    expect(note.mine).toBe(true);
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.method).toBe("POST");
+    expect(JSON.parse(init.body as string).fields).toEqual({
+      "Author name": "Aunt Sue",
+      Message: "wishing you the best",
+      Color: "Pink",
+      Invitee: ["rec_invitee_1"],
+    });
+  });
+
+  it("counts non-hidden notes for an invitee", async () => {
+    mockFetchSequence([
+      {
+        body: {
+          records: [
+            { id: "rec_note_1", fields: { Invitee: ["rec_invitee_1"] } },
+            { id: "rec_note_2", fields: { Invitee: ["rec_invitee_1"] } },
+          ],
+        },
+      },
+    ]);
+    const { getNoteCountForInvitee } = await import("./airtable");
+    expect(await getNoteCountForInvitee("rec_invitee_1")).toBe(2);
+  });
+
+  it("tags notes as 'mine' when linked to the viewer", async () => {
+    mockFetchSequence([
+      {
+        body: {
+          records: [
+            {
+              id: "rec_note_1",
+              fields: {
+                "Author name": "A",
+                Message: "m",
+                Color: "Sky",
+                Invitee: ["rec_invitee_1"],
+                "Heart count": 2,
+              },
+            },
+            {
+              id: "rec_note_2",
+              fields: {
+                "Author name": "B",
+                Message: "m",
+                Color: "Pink",
+                Invitee: ["rec_invitee_other"],
+              },
+            },
+          ],
+        },
+      },
+    ]);
+    const { getNotes } = await import("./airtable");
+    const notes = await getNotes("rec_invitee_1");
+    expect(notes[0].mine).toBe(true);
+    expect(notes[0].hearts).toBe(2);
+    expect(notes[1].mine).toBe(false);
+  });
+
+  it("increments a reaction counter, never going below zero", async () => {
+    const fetchMock = mockFetchSequence([
+      { body: { id: "rec_note_1", fields: { "Heart count": 0 } } },
+      { body: { id: "rec_note_1", fields: {} } },
+    ]);
+    const { adjustNoteReaction } = await import("./airtable");
+    await adjustNoteReaction("rec_note_1", "heart", -1);
+    const patchInit = fetchMock.mock.calls[1][1] as RequestInit;
+    expect(JSON.parse(patchInit.body as string)).toEqual({
+      fields: { "Heart count": 0 },
+    });
+  });
+});
+
+describe("incrementInviteeSardineClicks", () => {
+  it("reads the current counter and PATCHes the new total", async () => {
+    const fetchMock = mockFetchSequence([
+      { body: { id: "rec_invitee_1", fields: { "Sardine clicks": 7 } } },
+      { body: { id: "rec_invitee_1", fields: {} } },
+    ]);
+
+    const { incrementInviteeSardineClicks } = await import("./airtable");
+    await incrementInviteeSardineClicks("rec_invitee_1", 3);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const patchInit = fetchMock.mock.calls[1][1] as RequestInit;
+    expect(patchInit.method).toBe("PATCH");
+    expect(JSON.parse(patchInit.body as string)).toEqual({
+      fields: { "Sardine clicks": 10 },
+    });
+  });
+
+  it("treats a missing field as zero", async () => {
+    const fetchMock = mockFetchSequence([
+      { body: { id: "rec_invitee_1", fields: {} } },
+      { body: { id: "rec_invitee_1", fields: {} } },
+    ]);
+
+    const { incrementInviteeSardineClicks } = await import("./airtable");
+    await incrementInviteeSardineClicks("rec_invitee_1", 5);
+
+    const patchInit = fetchMock.mock.calls[1][1] as RequestInit;
+    expect(JSON.parse(patchInit.body as string)).toEqual({
+      fields: { "Sardine clicks": 5 },
+    });
+  });
+
+  it("does nothing when delta is zero or negative", async () => {
+    const fetchMock = mockFetchSequence([]);
+    const { incrementInviteeSardineClicks } = await import("./airtable");
+    await incrementInviteeSardineClicks("rec_invitee_1", 0);
+    await incrementInviteeSardineClicks("rec_invitee_1", -1);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("endOfWeddingDay", () => {
+  it("returns end-of-day Melbourne time during AEST (May, +10)", async () => {
+    const { endOfWeddingDay } = await import("./airtable");
+    // 23:59:59.999 on 2026-05-01 in Melbourne (+10) = 13:59:59.999Z UTC same day
+    expect(endOfWeddingDay("2026-05-01").toISOString()).toBe("2026-05-01T13:59:59.999Z");
+  });
+
+  it("returns end-of-day Melbourne time during AEDT (December, +11)", async () => {
+    const { endOfWeddingDay } = await import("./airtable");
+    // 23:59:59.999 on 2026-12-01 in Melbourne (+11) = 12:59:59.999Z UTC same day
+    expect(endOfWeddingDay("2026-12-01").toISOString()).toBe("2026-12-01T12:59:59.999Z");
+  });
+
+  it("ignores any time component in the input", async () => {
+    const { endOfWeddingDay } = await import("./airtable");
+    expect(endOfWeddingDay("2026-05-01T08:30:00.000Z").toISOString()).toBe(
+      "2026-05-01T13:59:59.999Z"
+    );
+  });
+});
+
 describe("updateInviteeEmail", () => {
   it("PATCHes the Invitees record with the new Email", async () => {
     const fetchMock = mockFetchSequence([{ body: { id: "rec_invitee_1", fields: {} } }]);

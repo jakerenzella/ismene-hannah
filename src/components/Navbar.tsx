@@ -37,6 +37,18 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
           >
             RSVP
           </a>
+          <a
+            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#moodboard"
+          >
+            Mood board
+          </a>
+          <a
+            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#travel"
+          >
+            Travel
+          </a>
           {showNotes && (
             <a
               className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
@@ -84,6 +96,20 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
             onClick={() => setMenuOpen(false)}
           >
             RSVP
+          </a>
+          <a
+            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#moodboard"
+            onClick={() => setMenuOpen(false)}
+          >
+            Mood board
+          </a>
+          <a
+            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#travel"
+            onClick={() => setMenuOpen(false)}
+          >
+            Travel
           </a>
           {showNotes && (
             <a

@@ -7,7 +7,6 @@ export type RsvpState =
         | "VALIDATION"
         | "INVALID_CODE"
         | "STORAGE_FAILED"
-        | "PARTIAL_FAILURE"
         | "HONEYPOT"
         | "DEADLINE_PASSED";
       message: string;

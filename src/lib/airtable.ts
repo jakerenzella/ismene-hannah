@@ -13,7 +13,6 @@ type InviteeFields = {
   Code: string;
   Household: string;
   "Max party size"?: number;
-  Email?: string;
   "Sardine clicks"?: number;
 };
 
@@ -22,8 +21,8 @@ type RsvpFields = {
   Attending: boolean;
   "Attendee names": string;
   "Party size": number;
-  Email?: string;
   Dietary?: string;
+  "Song requests"?: string;
   "Raw payload": string;
 };
 
@@ -70,14 +69,6 @@ export async function getInviteeByCode(code: string): Promise<Invitee | null> {
     household: record.fields.Household,
     maxPartySize: record.fields["Max party size"] ?? 1,
   };
-}
-
-export async function updateInviteeEmail(inviteeId: string, email: string): Promise<void> {
-  const table = env("AIRTABLE_INVITEES_TABLE");
-  await airtableFetch(`${tableUrl(table)}/${inviteeId}`, {
-    method: "PATCH",
-    body: JSON.stringify({ fields: { Email: email } }),
-  });
 }
 
 /**
@@ -236,9 +227,52 @@ export type ExistingRsvp = {
   recordId: string;
   attending: boolean;
   attendees: string[];
-  email: string;
+  /** One entry per attendee; empty string when none provided. Aligned by index with `attendees`. */
+  dietaries: string[];
+  /** Combined display string of all per-guest dietary requirements (for summary view). */
   dietary: string;
+  songRequests: string;
 };
+
+/**
+ * Parses the multi-line Dietary field back into a per-attendee array.
+ * Modern format: each line is `Name: requirement`. Falls back to a single
+ * combined string if the legacy single-textarea format is detected.
+ */
+function parseDietaryField(raw: string, attendees: string[]): string[] {
+  const result = attendees.map(() => "");
+  if (!raw) return result;
+  const lines = raw.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.length > 0);
+  let matchedAny = false;
+  for (const line of lines) {
+    const colon = line.indexOf(":");
+    if (colon <= 0) continue;
+    const name = line.slice(0, colon).trim();
+    const requirement = line.slice(colon + 1).trim();
+    const idx = attendees.findIndex((a) => a.toLowerCase() === name.toLowerCase());
+    if (idx >= 0) {
+      result[idx] = requirement;
+      matchedAny = true;
+    }
+  }
+  // Legacy fallback: single block of text with no name prefixes — surface it
+  // against the first attendee so it still shows up in the UI.
+  if (!matchedAny && attendees.length > 0) {
+    result[0] = raw.trim();
+  }
+  return result;
+}
+
+function formatDietariesForStorage(attendees: string[], dietaries: string[]): string {
+  const lines: string[] = [];
+  for (let i = 0; i < attendees.length; i++) {
+    const name = attendees[i];
+    const requirement = (dietaries[i] ?? "").trim();
+    if (!requirement) continue;
+    lines.push(`${name}: ${requirement}`);
+  }
+  return lines.join("\n");
+}
 
 export async function getExistingRsvpByCode(code: string): Promise<ExistingRsvp | null> {
   const table = env("AIRTABLE_RSVPS_TABLE");
@@ -257,24 +291,30 @@ export async function getExistingRsvpByCode(code: string): Promise<ExistingRsvp 
     .split(/\r?\n/)
     .map((n) => n.trim())
     .filter((n) => n.length > 0);
+  const dietaryRaw = record.fields.Dietary ?? "";
+  const dietaries = parseDietaryField(dietaryRaw, attendees);
   return {
     recordId: record.id,
     attending: !!record.fields.Attending,
     attendees,
-    email: record.fields.Email ?? "",
-    dietary: record.fields.Dietary ?? "",
+    dietaries,
+    dietary: dietaryRaw,
+    songRequests: record.fields["Song requests"] ?? "",
   };
 }
 
 function buildRsvpFields(inviteeId: string, payload: RsvpInput): RsvpFields {
   const attending = payload.attending === "yes";
+  const dietaryText = attending
+    ? formatDietariesForStorage(payload.attendees, payload.dietaries)
+    : "";
   return {
     Invitee: [inviteeId],
     Attending: attending,
     "Attendee names": payload.attendees.join("\n"),
     "Party size": attending ? payload.attendees.length : 0,
-    Email: payload.email || undefined,
-    Dietary: payload.dietary || undefined,
+    Dietary: dietaryText || undefined,
+    "Song requests": payload.songRequests || undefined,
     "Raw payload": JSON.stringify(payload),
   };
 }
@@ -287,10 +327,13 @@ export async function upsertRsvpForInvitee(
   const fields = buildRsvpFields(inviteeId, payload);
   const existing = await getExistingRsvpByCode(payload.code);
 
+  // typecast: true lets Airtable accept the request even if a brand-new column
+  // (e.g. Song requests) hasn't been added by hand yet — it auto-creates the
+  // missing column on first write rather than 422'ing.
   if (existing) {
     const response = await airtableFetch(`${tableUrl(table)}/${existing.recordId}`, {
       method: "PATCH",
-      body: JSON.stringify({ fields }),
+      body: JSON.stringify({ fields, typecast: true }),
     });
     const data = (await response.json()) as AirtableRecord<RsvpFields>;
     return { recordId: data.id, mode: "updated" };
@@ -298,7 +341,7 @@ export async function upsertRsvpForInvitee(
 
   const response = await airtableFetch(tableUrl(table), {
     method: "POST",
-    body: JSON.stringify({ fields }),
+    body: JSON.stringify({ fields, typecast: true }),
   });
   const data = (await response.json()) as AirtableRecord<RsvpFields>;
   return { recordId: data.id, mode: "created" };
@@ -376,7 +419,6 @@ export async function createInvitee(input: {
   code: string;
   household: string;
   maxPartySize: number;
-  email?: string;
 }): Promise<Invitee> {
   const table = env("AIRTABLE_INVITEES_TABLE");
   const fields: InviteeFields = {
@@ -384,7 +426,6 @@ export async function createInvitee(input: {
     Household: input.household,
     "Max party size": input.maxPartySize,
   };
-  if (input.email) fields.Email = input.email;
   const response = await airtableFetch(tableUrl(table), {
     method: "POST",
     body: JSON.stringify({ fields }),

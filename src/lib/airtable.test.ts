@@ -38,8 +38,8 @@ const validPayload: RsvpInput = {
   code: "AB12CD",
   attending: "yes",
   attendees: ["Jane Smith", "John Smith"],
-  email: "jane@example.com",
-  dietary: "",
+  dietaries: ["vegetarian", ""],
+  songRequests: "",
   website: "",
 };
 
@@ -100,10 +100,15 @@ describe("upsertRsvpForInvitee", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const postInit = fetchMock.mock.calls[1][1] as RequestInit;
     expect(postInit.method).toBe("POST");
-    const sentFields = JSON.parse(postInit.body as string).fields;
+    const sentBody = JSON.parse(postInit.body as string);
+    const sentFields = sentBody.fields;
     expect(sentFields["Attendee names"]).toBe("Jane Smith\nJohn Smith");
     expect(sentFields["Party size"]).toBe(2);
+    // Dietary becomes a per-attendee block, only listing those with requirements.
+    expect(sentFields["Dietary"]).toBe("Jane Smith: vegetarian");
     expect(sentFields).not.toHaveProperty("Additional guests");
+    // typecast lets Airtable auto-create the Song requests column on first write.
+    expect(sentBody.typecast).toBe(true);
   });
 
   it("writes Party size 0 when declining", async () => {
@@ -117,7 +122,7 @@ describe("upsertRsvpForInvitee", () => {
       ...validPayload,
       attending: "no",
       attendees: [],
-      email: "",
+      dietaries: [],
     });
 
     const sentFields = JSON.parse(
@@ -167,8 +172,8 @@ describe("getExistingRsvpByCode", () => {
               fields: {
                 Attending: true,
                 "Attendee names": "Jane Smith\nJohn Smith",
-                Email: "jane@example.com",
-                Dietary: "vegetarian",
+                Dietary: "Jane Smith: vegetarian",
+                "Song requests": "Dancing Queen",
               },
             },
           ],
@@ -183,8 +188,9 @@ describe("getExistingRsvpByCode", () => {
       recordId: "rec_rsvp_1",
       attending: true,
       attendees: ["Jane Smith", "John Smith"],
-      email: "jane@example.com",
-      dietary: "vegetarian",
+      dietaries: ["vegetarian", ""],
+      dietary: "Jane Smith: vegetarian",
+      songRequests: "Dancing Queen",
     });
     const url = fetchMock.mock.calls[0][0] as string;
     expect(url).toContain("RSVPs");
@@ -360,31 +366,6 @@ describe("endOfWeddingDay", () => {
     const { endOfWeddingDay } = await import("./airtable");
     expect(endOfWeddingDay("2026-05-01T08:30:00.000Z").toISOString()).toBe(
       "2026-05-01T13:59:59.999Z"
-    );
-  });
-});
-
-describe("updateInviteeEmail", () => {
-  it("PATCHes the Invitees record with the new Email", async () => {
-    const fetchMock = mockFetchSequence([{ body: { id: "rec_invitee_1", fields: {} } }]);
-
-    const { updateInviteeEmail } = await import("./airtable");
-    await updateInviteeEmail("rec_invitee_1", "guest@example.com");
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toContain("/Invitees/rec_invitee_1");
-    expect(init.method).toBe("PATCH");
-    expect(JSON.parse(init.body as string)).toEqual({
-      fields: { Email: "guest@example.com" },
-    });
-  });
-
-  it("throws on a non-2xx response", async () => {
-    mockFetchSequence([{ status: 500, body: { error: "boom" } }]);
-    const { updateInviteeEmail } = await import("./airtable");
-    await expect(updateInviteeEmail("rec_invitee_1", "g@example.com")).rejects.toThrow(
-      /Airtable 500/
     );
   });
 });

@@ -50,76 +50,153 @@ export default function Details({
         />
       </div>
 
-      {/* Secondary details */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10 items-stretch">
-        <div
-          id="details"
-          className="md:col-span-3 bg-surface-container-lowest p-8 md:p-14 rounded-3xl scrapbook-shadow flex flex-col lg:flex-row gap-10 items-center border border-primary-container/10 scroll-mt-24"
-        >
-          <div className="w-full lg:w-1/2">
-            <h3 className="font-display text-4xl font-bold text-primary mb-6 flex items-center gap-3">
-              <DoodleIcon name="location-marker" className="w-10 h-10 text-primary" />
-              The Celebration
-            </h3>
-            <p className="text-lg text-on-surface-variant mb-8 leading-relaxed">
-              Join us for an evening of dancing, dining, and joy at the Abbotsford Convent. We&apos;ve
-              chosen this spot for its winding gardens and beautiful historic architecture.
+      {/* Venues: ceremony, reception, afterparty grouped in one labelled block. */}
+      <div id="details" className="relative z-10 scroll-mt-24">
+        <div className="bg-surface-container-low/40 rounded-[2.5rem] p-6 md:p-10 border border-primary-container/20">
+          <div className="text-center mb-8 md:mb-10">
+            <h2 className="font-display text-5xl md:text-6xl font-bold text-primary handwritten-tilt inline-block">
+              Venues
+            </h2>
+            <p className="mt-3 text-on-surface-variant text-base md:text-lg max-w-xl mx-auto">
+              Ceremony, reception, and afterparty — all within Melbourne&apos;s inner
+              north.
             </p>
-            <div className="space-y-3 font-headline font-bold text-xl text-on-surface">
-              <p className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                Abbotsford Convent, Melbourne
-              </p>
-              <p className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                Arrival: 4:30 PM
-              </p>
-              <p className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                Ceremony: 5:00 PM
+          </div>
+
+          <div className="space-y-8">
+            <VenueCard
+              icon="location-marker"
+              title="Ceremony"
+              venue="The Village Green at Ceres, Brunswick"
+              schedule={[
+                "Arrive 4:00 PM",
+                "Ceremony begins 4:30 PM",
+              ]}
+              intro="An outdoor ceremony on the grass at Ceres Environment Park. Comfortable shoes very welcome."
+              mapSrc="https://www.google.com/maps?q=CERES+Community+Environment+Park,+Lee+St,+Brunswick+East+VIC+3057,+Australia&output=embed"
+              mapTitle="CERES Environment Park map"
+              mapTilt="-1deg"
+            />
+
+            <VenueCard
+              icon="forward"
+              title="Reception"
+              venue="Maharaja Palace, Northcote"
+              schedule={["From 6:00 PM"]}
+              intro="From Ceres it's a short walk, Uber, or public-transport hop across to Northcote for dinner, drinks, and dancing."
+              mapSrc="https://www.google.com/maps?q=Maharaja+Palace,+Northcote+VIC,+Australia&output=embed"
+              mapTitle="Maharaja Palace map"
+              mapTilt="1deg"
+              flipLayout
+            />
+
+            <div className="bg-surface-container-lowest p-8 md:p-14 rounded-3xl scrapbook-shadow border border-primary-container/10 text-center handwritten-tilt-alt max-w-3xl mx-auto">
+              <DoodleIcon name="star" className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="font-display text-4xl font-bold text-primary mb-3">Afterparty (TBC)</h3>
+              <p className="text-lg text-on-surface-variant leading-relaxed">
+                From <span className="font-headline font-bold text-on-surface">11pm til late</span> —
+                venue to be confirmed. We&apos;ll share the details closer to the day.
               </p>
             </div>
           </div>
-          <div className="w-full lg:w-1/2 h-80 rounded-2xl overflow-hidden border-8 border-surface-container rotate-[-1deg]">
-            <iframe
-              src="https://www.google.com/maps?q=Abbotsford+Convent,+1+St+Heliers+St,+Abbotsford+VIC+3067,+Australia&output=embed"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Abbotsford Convent Map"
-            />
-          </div>
         </div>
 
-        <div className="md:col-span-3 bg-surface-container/30 p-8 rounded-3xl scrapbook-shadow border border-outline-variant/10 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
+        <div className="mt-10 bg-surface-container/30 p-8 rounded-3xl scrapbook-shadow border border-outline-variant/10 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
           <div className="flex gap-4">
             <div className="bg-primary-container/30 p-3 rounded-xl h-fit rotate-[-5deg]">
               <DoodleIcon name="map" className="w-10 h-10 text-primary" />
             </div>
             <div>
-              <h5 className="font-headline font-extrabold text-lg text-on-surface mb-1">Parking</h5>
+              <h5 className="font-headline font-extrabold text-lg text-on-surface mb-1">
+                Getting there
+              </h5>
               <p className="text-sm text-on-surface-variant">
-                Ample parking is available on-site at the convent main entrance.
+                It&apos;s a short walk between Ceres and Maharaja Palace, or jump in an Uber. Trams
+                86 / 11 and Upfield-line trains both run nearby.
               </p>
             </div>
           </div>
           <div className="flex gap-4">
             <div className="bg-primary-container/30 p-3 rounded-xl h-fit rotate-[8deg]">
-              <DoodleIcon name="tag" className="w-10 h-10 text-primary" />
+              <DoodleIcon name="plane" className="w-10 h-10 text-primary" />
             </div>
             <div>
-              <h5 className="font-headline font-extrabold text-lg text-on-surface mb-1">Attire</h5>
+              <h5 className="font-headline font-extrabold text-lg text-on-surface mb-1">
+                Coming from interstate?
+              </h5>
               <p className="text-sm text-on-surface-variant">
-                Cocktail attire. The ceremony is outdoors on grass, so choose footwear accordingly!
+                We&apos;ve put together a few suburb suggestions for accommodation —{" "}
+                <a className="text-primary underline decoration-primary/40 hover:decoration-primary" href="#travel">
+                  see the travel notes below
+                </a>
+                .
               </p>
             </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function VenueCard({
+  icon,
+  title,
+  venue,
+  schedule,
+  intro,
+  mapSrc,
+  mapTitle,
+  mapTilt,
+  flipLayout = false,
+}: {
+  icon: string;
+  title: string;
+  venue: string;
+  schedule: string[];
+  intro: string;
+  mapSrc: string;
+  mapTitle: string;
+  mapTilt: string;
+  flipLayout?: boolean;
+}) {
+  return (
+    <div className="bg-surface-container-lowest p-8 md:p-14 rounded-3xl scrapbook-shadow flex flex-col lg:flex-row gap-10 items-center border border-primary-container/10">
+      <div className={`w-full lg:w-1/2 ${flipLayout ? "lg:order-2" : ""}`}>
+        <h3 className="font-display text-4xl font-bold text-primary mb-6 flex items-center gap-3">
+          <DoodleIcon name={icon} className="w-10 h-10 text-primary" />
+          {title}
+        </h3>
+        <p className="text-lg text-on-surface-variant mb-8 leading-relaxed">{intro}</p>
+        <div className="space-y-3 font-headline font-bold text-xl text-on-surface">
+          <p className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-primary" />
+            {venue}
+          </p>
+          {schedule.map((line) => (
+            <p key={line} className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary" />
+              {line}
+            </p>
+          ))}
+        </div>
+      </div>
+      <div
+        className={`w-full lg:w-1/2 h-80 rounded-2xl overflow-hidden border-8 border-surface-container ${flipLayout ? "lg:order-1" : ""}`}
+        style={{ transform: `rotate(${mapTilt})` }}
+      >
+        <iframe
+          src={mapSrc}
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title={mapTitle}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -215,12 +292,22 @@ function RsvpForm({
   const [attendees, setAttendees] = useState<string[]>(() =>
     Array.from({ length: invitee.maxPartySize }, (_, i) => existingRsvp?.attendees[i] ?? "")
   );
-  const [email, setEmail] = useState<string>(existingRsvp?.email ?? "");
-  const [dietary, setDietary] = useState<string>(existingRsvp?.dietary ?? "");
+  const [dietaries, setDietaries] = useState<string[]>(() =>
+    Array.from({ length: invitee.maxPartySize }, (_, i) => existingRsvp?.dietaries[i] ?? "")
+  );
+  const [songRequests, setSongRequests] = useState<string>(existingRsvp?.songRequests ?? "");
   const [editing, setEditing] = useState<boolean>(!existingRsvp);
 
   function setAttendeeAt(index: number, value: string) {
     setAttendees((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  }
+
+  function setDietaryAt(index: number, value: string) {
+    setDietaries((prev) => {
       const next = [...prev];
       next[index] = value;
       return next;
@@ -265,14 +352,19 @@ function RsvpForm({
 
   return (
     <div className="text-center">
+      {deadlineLabel && (
+        <div className="inline-flex items-center gap-2 bg-primary-container/40 border border-primary/20 rounded-full px-4 py-1.5 mb-4 -rotate-1">
+          <DoodleIcon name="calendar" className="w-4 h-4 text-primary" />
+          <span className="font-headline font-extrabold text-sm uppercase tracking-wider text-primary">
+            RSVP by {deadlineLabel}
+          </span>
+        </div>
+      )}
       <h3 className="font-display text-4xl md:text-5xl font-bold text-primary mb-3">
         {existingRsvp ? "Update your RSVP" : "Are you coming?"}
       </h3>
       {!existingRsvp && (
-        <p className="text-on-surface-variant mb-2 text-lg">
-          Hi {invitee.household} —{" "}
-          {deadlineLabel ? `please let us know by ${deadlineLabel}.` : "please let us know."}
-        </p>
+        <p className="text-on-surface-variant mb-2 text-lg">Hi {invitee.household} — please let us know below.</p>
       )}
 
       <form className="space-y-6 text-left mt-8" action={action} noValidate>
@@ -328,84 +420,76 @@ function RsvpForm({
           <Field
             label={
               invitee.maxPartySize === 1
-                ? "Your name"
+                ? "Your name & dietary needs"
                 : cappedPartySize === 1
-                  ? "Name"
-                  : "Names of attending guests"
+                  ? "Name & dietary needs"
+                  : "Each guest"
             }
+            hint="Add dietary requirements per guest (optional)."
             error={fieldErrors.attendees?.[0]}
           >
             <div
               className={
                 cappedPartySize > 1
-                  ? "grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3"
-                  : "space-y-3"
+                  ? "grid grid-cols-1 md:grid-cols-2 gap-4"
+                  : "space-y-4"
               }
             >
               {nameSlots.map((index) => (
-                <input
+                <div
                   key={index}
-                  className={inputClasses}
-                  placeholder={
-                    invitee.maxPartySize === 1
-                      ? "Type here..."
-                      : index === 0
+                  className="bg-surface-container-low/60 border border-outline-variant/40 rounded-2xl p-4"
+                >
+                  <input
+                    className={inputClasses}
+                    placeholder={
+                      invitee.maxPartySize === 1
                         ? "Your name"
-                        : `Guest ${index + 1}`
-                  }
-                  type="text"
-                  name="attendees"
-                  required
-                  maxLength={120}
-                  autoComplete={index === 0 ? "name" : "off"}
-                  value={attendees[index] ?? ""}
-                  onChange={(e) => setAttendeeAt(index, e.target.value)}
-                />
+                        : index === 0
+                          ? "Your name"
+                          : `Guest ${index + 1}`
+                    }
+                    type="text"
+                    name="attendees"
+                    required
+                    maxLength={120}
+                    autoComplete={index === 0 ? "name" : "off"}
+                    value={attendees[index] ?? ""}
+                    onChange={(e) => setAttendeeAt(index, e.target.value)}
+                  />
+                  <input
+                    className={`${inputClasses} mt-1 text-base`}
+                    placeholder="Dietary needs (optional)"
+                    type="text"
+                    name="dietaries"
+                    maxLength={500}
+                    autoComplete="off"
+                    value={dietaries[index] ?? ""}
+                    onChange={(e) => setDietaryAt(index, e.target.value)}
+                  />
+                </div>
               ))}
             </div>
           </Field>
         )}
 
-        <div
-          className={
-            showAttendeeFields ? "grid grid-cols-1 md:grid-cols-2 gap-6" : ""
-          }
-        >
+        {showAttendeeFields && (
           <Field
-            label="Email"
-            hint={
-              attending === "no"
-                ? "Optional — we'll only use this if we need to follow up."
-                : "So we can send confirmation and event updates."
-            }
-            error={fieldErrors.email?.[0]}
+            label="Song requests"
+            hint="Anything we have to play? (Optional)"
+            error={fieldErrors.songRequests?.[0]}
           >
-            <input
-              className={inputClasses}
-              placeholder="you@example.com"
-              type="email"
-              name="email"
-              maxLength={320}
-              required={showAttendeeFields}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+            <textarea
+              className={`${inputClasses} resize-none`}
+              placeholder="The dancefloor demands…"
+              name="songRequests"
+              maxLength={500}
+              rows={2}
+              value={songRequests}
+              onChange={(e) => setSongRequests(e.target.value)}
             />
           </Field>
-
-          {showAttendeeFields && (
-            <Field label="Dietary requirements" error={fieldErrors.dietary?.[0]}>
-              <textarea
-                className={`${inputClasses} resize-none`}
-                placeholder="Allergies, intolerances, or preferences (optional)"
-                name="dietary"
-                maxLength={1000}
-                rows={2}
-                value={dietary}
-                onChange={(e) => setDietary(e.target.value)}
-              />
-            </Field>
-          )}
-        </div>
+        )}
 
         {state.status === "error" && state.code !== "VALIDATION" && (
           <p className="text-red-700 text-sm" role="alert" aria-live="polite">
@@ -533,13 +617,23 @@ function RsvpSummary({
               </span>
             </div>
             {existingRsvp.attendees.length > 0 && (
-              <ul className="space-y-1 mb-4">
-                {existingRsvp.attendees.map((name, i) => (
-                  <li key={i} className="flex items-center gap-2 text-on-surface">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    {name}
-                  </li>
-                ))}
+              <ul className="space-y-2 mb-4">
+                {existingRsvp.attendees.map((name, i) => {
+                  const requirement = (existingRsvp.dietaries[i] ?? "").trim();
+                  return (
+                    <li key={i} className="flex items-start gap-2 text-on-surface">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                      <span>
+                        {name}
+                        {requirement && (
+                          <span className="block text-xs text-on-surface-variant mt-0.5">
+                            {requirement}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </>
@@ -548,20 +642,12 @@ function RsvpSummary({
             Not attending
           </p>
         )}
-        {existingRsvp.email && (
-          <p className="text-sm text-on-surface-variant break-all">
-            <span className="font-headline font-bold uppercase tracking-wider text-xs text-on-surface-variant/80 mr-2">
-              Email
-            </span>
-            {existingRsvp.email}
-          </p>
-        )}
-        {existingRsvp.dietary && (
+        {existingRsvp.songRequests && (
           <p className="text-sm text-on-surface-variant mt-2">
             <span className="font-headline font-bold uppercase tracking-wider text-xs text-on-surface-variant/80 mr-2">
-              Dietary
+              Songs
             </span>
-            {existingRsvp.dietary}
+            {existingRsvp.songRequests}
           </p>
         )}
       </div>

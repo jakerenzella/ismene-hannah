@@ -22,7 +22,7 @@ export default function Hero() {
           {/* Date/location pill — scrapbook corner overlapping bottom-left of image */}
           <div className="absolute -bottom-6 -left-6 md:-left-12 z-20 bg-surface-container-lowest scrapbook-shadow px-8 py-4 rounded-full handwritten-tilt-alt border-2 border-secondary-container/40">
             <p className="font-headline text-xl md:text-2xl font-bold text-secondary whitespace-nowrap">
-              27.07.27 &bull; Melbourne
+              27.02.27 &bull; Melbourne
             </p>
           </div>
 

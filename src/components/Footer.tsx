@@ -5,7 +5,7 @@ export default function Footer() {
         Ismene + Hannah
       </div>
       <div className="font-body text-sm uppercase font-medium tracking-[0.3em] text-outline">
-        27.07.27 &bull; Melbourne
+        27.02.27 &bull; Melbourne
       </div>
       <p className="font-body text-xs text-outline-variant">Website by Jake</p>
     </footer>

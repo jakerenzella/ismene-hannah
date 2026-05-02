@@ -2,6 +2,9 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import OurStory from "@/components/OurStory";
 import Details from "@/components/Details";
+import MoodBoard from "@/components/MoodBoard";
+import Gift from "@/components/Gift";
+import Travel from "@/components/Travel";
 import Notes from "@/components/Notes";
 import Footer from "@/components/Footer";
 import Sticker from "@/components/Sticker";
@@ -94,6 +97,9 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           rsvpClosed={rsvpClosed}
           deadlineLabel={deadlineLabel}
         />
+        <MoodBoard />
+        {invitee && <Gift />}
+        <Travel />
         {invitee && (
           <Notes
             notes={notes}

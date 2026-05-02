@@ -122,7 +122,7 @@ function WelcomeContent({ invitee }: { invitee: Invitee }) {
 
       <p className="text-lg md:text-xl text-on-surface-variant max-w-md mx-auto mb-10 leading-relaxed">
         Ismene &amp; Hannah are tying the knot on{" "}
-        <span className="font-headline font-bold text-on-surface">27 July 2027</span>
+        <span className="font-headline font-bold text-on-surface">27 February 2027</span>
         {" in Melbourne — and they\u2019d love to share the day with you."}
       </p>
 

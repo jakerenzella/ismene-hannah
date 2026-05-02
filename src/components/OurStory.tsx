@@ -1,12 +1,5 @@
 import Image from "next/image";
 import FishSwarm from "@/components/FishSwarm";
-import DoodleIcon from "@/components/DoodleIcon";
-
-const milestones = [
-  { icon: "heart", label: "First Date", detail: "Fitzroy, 2022" },
-  { icon: "home", label: "New Home", detail: "Carlton, 2024" },
-  { icon: "medal", label: "The Yes!", detail: "Botanic Gardens, 2026" },
-];
 
 export default function OurStory({ code }: { code: string | null }) {
   return (
@@ -35,24 +28,6 @@ export default function OurStory({ code }: { code: string | null }) {
             been filled with laughter, art, and enough coffee to fuel a small city.
             We can&apos;t wait to write our next chapter with you.
           </p>
-        </div>
-
-        {/* Timeline cards */}
-        <div className="flex flex-wrap justify-center gap-8 mt-16">
-          {milestones.map((m, i) => (
-            <div
-              key={m.label}
-              className={`bg-surface-container-lowest p-8 rounded-2xl scrapbook-shadow w-56 border border-outline-variant/10 ${
-                i % 2 === 0 ? "handwritten-tilt" : "handwritten-tilt-alt"
-              }`}
-            >
-              <DoodleIcon name={m.icon} className="w-10 h-10 mb-3 mx-auto text-primary" />
-              <p className="font-headline font-bold text-xl text-on-surface">
-                {m.label}
-              </p>
-              <p className="text-sm text-on-surface-variant mt-1">{m.detail}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>

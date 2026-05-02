@@ -4,10 +4,8 @@ import {
   getInviteeByCode,
   getSettings,
   isPastDeadline,
-  updateInviteeEmail,
   upsertRsvpForInvitee,
 } from "@/lib/airtable";
-import { sendRsvpNotification } from "@/lib/email";
 import { parseFormData, RsvpInputSchema } from "@/lib/rsvp-schema";
 import type { RsvpState } from "./rsvp-state";
 
@@ -68,52 +66,20 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
     };
   }
 
-  let storageOk = false;
-  let mode: "created" | "updated" = "created";
+  let mode: "created" | "updated";
   try {
     const result = await upsertRsvpForInvitee(invitee.id, payload);
     mode = result.mode;
-    storageOk = true;
   } catch (error) {
     console.error("[rsvp] airtable write failed", { error, payload });
-  }
-
-  if (storageOk && payload.email) {
-    try {
-      await updateInviteeEmail(invitee.id, payload.email);
-    } catch (error) {
-      console.error("[rsvp] invitee email write-back failed", {
-        error,
-        inviteeId: invitee.id,
-        email: payload.email,
-      });
-    }
-  }
-
-  let emailOk = false;
-  try {
-    await sendRsvpNotification({ invitee, payload, mode });
-    emailOk = true;
-  } catch (error) {
-    console.error("[rsvp] resend failed", { error, payload });
-  }
-
-  if (storageOk) {
-    return { status: "ok", mode };
-  }
-  if (emailOk) {
     return {
       status: "error",
-      code: "PARTIAL_FAILURE",
-      message:
-        "We received your details by email but our database had a hiccup. Please screenshot this and email us to confirm.",
+      code: "STORAGE_FAILED",
+      message: "Something went wrong on our end. Please try again, or email us.",
     };
   }
-  return {
-    status: "error",
-    code: "STORAGE_FAILED",
-    message: "Something went wrong on our end. Please try again, or email us.",
-  };
+
+  return { status: "ok", mode };
 }
 
 async function safeGetInvitee(code: string) {

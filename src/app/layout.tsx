@@ -7,9 +7,12 @@ const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Ismene + Hannah's Wedding — 27 July 2027 in Melbourne",
+  title: "Ismene + Hannah's Wedding — 27 February 2027 in Melbourne",
   description:
-    "Ismene & Hannah are tying the knot in Melbourne on 27 July 2027. Join us for an evening of dancing, dining, and joy at the Abbotsford Convent.",
+    "Ismene & Hannah are tying the knot in Melbourne on 27 February 2027. Join us at the Village Green at Ceres in Brunswick for the ceremony, then on to Maharaja Palace in Northcote for dinner and dancing.",
+  icons: {
+    icon: "/assets/favicon.svg",
+  },
 };
 
 export default function RootLayout({

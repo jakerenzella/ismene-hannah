@@ -53,10 +53,9 @@ Need to filter to "only confirmed"? Switch to the **Confirmed** view first; the 
 
 Open **Invitees** → click the `+` at the bottom of the table → fill in:
 
-- **Code** — type 6 characters from `0–9` and `A–Z` *minus the letters I, L, O, U*. Example: `AB12CD`. Make sure it's not already used. **Don't ever change this once shared.**
+- **Code** — 6 characters from `0–9` and `A–Z` (uppercase). Example: `AB12CD`. Make sure it's not already used. **Don't ever change this once shared.**
 - **Household** — display name, e.g. "The Patel family"
 - **Max party size** — how many people they're allowed to bring (1, 2, 3…)
-- **Email** *(optional)* — leave blank if you don't know it; it'll fill in automatically when they RSVP.
 - **Notes** *(optional)* — anything for your eyes only ("dad's side", "lives in NZ")
 
 That's it. They're now invited.
@@ -78,6 +77,17 @@ When they open the link, they'll see a personalised welcome page with their hous
 ### 5. Look up dietary needs (closer to the day)
 
 Open **RSVPs** → switch to the **Dietary needs** view. You'll see only rows where someone wrote something. Hand this list to your caterer.
+
+The `Dietary` column is one block of text per RSVP, with **one line per guest** that has a requirement, formatted as `Name: requirement`. Guests with no requirements simply don't appear in that block. Example:
+
+```
+Hannah Smith: vegetarian, no nuts
+Bob Smith: gluten free
+```
+
+### 5b. Look up song requests
+
+Open **RSVPs** → look at the **Song requests** column. It's free text — guests are encouraged to drop their must-plays here. Hand the list to whoever is running the music.
 
 ### 6. Change the RSVP deadline
 
@@ -124,8 +134,8 @@ Each RSVP row tells you:
 - **Attending** — checkbox: are they coming?
 - **Party size** — how many of them are coming
 - **Attendee names** — the actual names (one per line)
-- **Email** — the address they entered (we'll use this for confirmations / day-of updates)
-- **Dietary** — anything for the caterer
+- **Dietary** — one line per guest who entered something (`Name: requirement`)
+- **Song requests** — free-text song wishlist
 - **Submitted at** — when they replied
 - **Invitee** — the linked household (click to jump back)
 
@@ -135,7 +145,7 @@ If a guest changes their mind, they can reopen their invite link and resubmit. T
 
 ## When something goes wrong
 
-- A guest says **"my code doesn't work"** — check the Invitees table for typos in their `Code`. Codes are case-sensitive on the link (always uppercase) and can't contain the letters I, L, O, or U.
+- A guest says **"my code doesn't work"** — check the Invitees table for typos in their `Code`. Codes are case-insensitive on the link (we uppercase before lookup).
 - An RSVP **looks half-empty** — check the `Raw payload` column for what was submitted; sometimes guests skip optional fields.
 - You see **two RSVPs for one household** — keep the most recent (`Submitted at`), delete the older one. Future submissions will overwrite the kept row.
 - **Anything else** — message Jake. Screenshots help.
@@ -150,8 +160,8 @@ If a guest changes their mind, they can reopen their invite link and resubmit. T
 | How many are coming? | Invitees → SUM of `Confirmed seats` |
 | Who hasn't replied? | Invitees → Pending view |
 | Who needs vegan food? | RSVPs → Dietary needs view |
+| What songs do guests want? | RSVPs → `Song requests` column |
 | When did they reply? | RSVPs → `Submitted at` |
-| What's their email? | Invitees → `Email` (auto-filled from their RSVP) |
 
 ---
 

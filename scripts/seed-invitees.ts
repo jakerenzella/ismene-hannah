@@ -12,7 +12,7 @@ import { INVITE_CODE_ALPHABET } from "../src/lib/rsvp-schema";
 
 const generateCode = customAlphabet(INVITE_CODE_ALPHABET, 6);
 
-type Row = { household: string; maxPartySize: number; email?: string };
+type Row = { household: string; maxPartySize: number };
 
 function parseCsv(input: string): Row[] {
   const lines = input
@@ -25,7 +25,6 @@ function parseCsv(input: string): Row[] {
   const headers = headerLine.split(",").map((h) => h.trim().toLowerCase());
   const householdIdx = headers.indexOf("household");
   const maxIdx = headers.indexOf("max_party_size");
-  const emailIdx = headers.indexOf("email");
   if (householdIdx === -1 || maxIdx === -1) {
     throw new Error("CSV must have 'household' and 'max_party_size' columns");
   }
@@ -38,8 +37,7 @@ function parseCsv(input: string): Row[] {
     if (!Number.isFinite(max) || max < 1) {
       throw new Error(`Row ${i + 2}: max_party_size must be a number ≥ 1`);
     }
-    const email = emailIdx === -1 ? undefined : cells[emailIdx]?.trim() || undefined;
-    return { household, maxPartySize: max, email };
+    return { household, maxPartySize: max };
   });
 }
 
@@ -92,7 +90,6 @@ async function main() {
       code,
       household: row.household,
       maxPartySize: row.maxPartySize,
-      email: row.email,
     });
     const link = `${baseUrl}/i/${invitee.code}`;
     created.push({ household: invitee.household, code: invitee.code, link });

@@ -117,8 +117,10 @@ export default function Details({
             </div>
           </div>
           <div className="flex gap-4">
-            <div className="bg-primary-container/30 p-3 rounded-xl h-fit rotate-[8deg]">
-              <DoodleIcon name="plane" className="w-10 h-10 text-primary" />
+            <div className="bg-primary-container/30 p-3 rounded-xl h-fit rotate-[8deg] flex items-center justify-center">
+              <span className="material-symbols-outlined text-primary text-[40px] leading-none">
+                flight
+              </span>
             </div>
             <div>
               <h5 className="font-headline font-extrabold text-lg text-on-surface mb-1">

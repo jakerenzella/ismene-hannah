@@ -26,16 +26,16 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
             Our Story
           </a>
           <a
-            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
-            href="#details"
-          >
-            Details
-          </a>
-          <a
             className="font-headline tracking-tight text-lg text-primary font-bold border-b-2 border-primary pb-1"
             href="#rsvp"
           >
             RSVP
+          </a>
+          <a
+            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#details"
+          >
+            Details
           </a>
           <a
             className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
@@ -84,18 +84,18 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
             Our Story
           </a>
           <a
-            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors"
-            href="#details"
-            onClick={() => setMenuOpen(false)}
-          >
-            Details
-          </a>
-          <a
             className="font-headline text-lg text-primary font-bold"
             href="#rsvp"
             onClick={() => setMenuOpen(false)}
           >
             RSVP
+          </a>
+          <a
+            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#details"
+            onClick={() => setMenuOpen(false)}
+          >
+            Details
           </a>
           <a
             className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors"

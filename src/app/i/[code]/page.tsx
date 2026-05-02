@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getInviteeByCode } from "@/lib/airtable";
@@ -6,6 +7,43 @@ import { INVITE_CODE_REGEX, type Invitee } from "@/lib/rsvp-schema";
 type Params = Promise<{ code: string }>;
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
+  const { code: rawCode } = await params;
+  const code = rawCode.trim().toUpperCase();
+
+  let household: string | null = null;
+  if (INVITE_CODE_REGEX.test(code)) {
+    try {
+      const invitee = await getInviteeByCode(code);
+      household = invitee?.household ?? null;
+    } catch {
+      // fall through to the generic title — the page itself handles errors
+    }
+  }
+
+  // Personalised share text. The Household field doubles as the recipient name
+  // (a first name, "Tom & Jess", "The Smith Family", etc.) and is what guests
+  // see in iMessage / WhatsApp / Slack link previews.
+  const title = household
+    ? `Hey ${household}, you're invited to Ismene + Hannah's wedding`
+    : "You're invited to Ismene + Hannah's wedding";
+  const description =
+    "27 February 2027 in Melbourne — tap through to RSVP and see all the details.";
+
+  return {
+    title,
+    description,
+    openGraph: { title, description },
+    twitter: { card: "summary_large_image", title, description },
+    // Personal invite links shouldn't show up in search results.
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function InvitePage({ params }: { params: Params }) {
   const { code: rawCode } = await params;

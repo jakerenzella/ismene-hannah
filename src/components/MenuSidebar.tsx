@@ -26,8 +26,8 @@ export default function MenuSidebar({
 
   const items: MenuItem[] = [
     { label: "Our Story", anchor: "story" },
-    { label: "Details", anchor: "details" },
     { label: "RSVP", anchor: "rsvp" },
+    { label: "Details", anchor: "details" },
     { label: "Mood board", anchor: "moodboard" },
     { label: "Travel", anchor: "travel" },
     ...(showNotes ? [{ label: "Notes wall", anchor: "notes" }] : []),

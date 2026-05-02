@@ -23,7 +23,7 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
             className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
             href="#story"
           >
-            Our Story
+            Our Wedding
           </a>
           <a
             className="font-headline tracking-tight text-lg text-primary font-bold border-b-2 border-primary pb-1"
@@ -81,7 +81,7 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
             href="#story"
             onClick={() => setMenuOpen(false)}
           >
-            Our Story
+            Our Wedding
           </a>
           <a
             className="font-headline text-lg text-primary font-bold"

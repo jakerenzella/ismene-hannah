@@ -25,7 +25,7 @@ export default function MenuSidebar({
   }, [isOpen, onClose]);
 
   const items: MenuItem[] = [
-    { label: "Our Story", anchor: "story" },
+    { label: "Our Wedding", anchor: "story" },
     { label: "RSVP", anchor: "rsvp" },
     { label: "Details", anchor: "details" },
     { label: "Mood board", anchor: "moodboard" },

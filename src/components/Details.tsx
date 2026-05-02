@@ -118,7 +118,10 @@ export default function Details({
           </div>
           <div className="flex gap-4">
             <div className="bg-primary-container/30 p-3 rounded-xl h-fit rotate-[8deg] flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary text-[40px] leading-none">
+              <span
+                className="material-symbols-outlined text-primary text-[40px] leading-none"
+                style={{ fontVariationSettings: '"FILL" 0, "wght" 700, "GRAD" 200' }}
+              >
                 flight
               </span>
             </div>

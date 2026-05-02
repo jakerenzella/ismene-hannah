@@ -79,7 +79,7 @@ export default function Details({
             />
 
             <VenueCard
-              icon="forward"
+              icon="home"
               title="Reception"
               venue="Maharaja Palace, Northcote"
               schedule={["From 6:00 PM"]}
@@ -104,7 +104,7 @@ export default function Details({
         <div className="mt-10 bg-surface-container/30 p-8 rounded-3xl scrapbook-shadow border border-outline-variant/10 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
           <div className="flex gap-4">
             <div className="bg-primary-container/30 p-3 rounded-xl h-fit rotate-[-5deg]">
-              <DoodleIcon name="map" className="w-10 h-10 text-primary" />
+              <DoodleIcon name="forward" className="w-10 h-10 text-primary" />
             </div>
             <div>
               <h5 className="font-headline font-extrabold text-lg text-on-surface mb-1">
@@ -169,14 +169,14 @@ function VenueCard({
         </h3>
         <p className="text-lg text-on-surface-variant mb-8 leading-relaxed">{intro}</p>
         <div className="space-y-3 font-headline font-bold text-xl text-on-surface">
-          <p className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-primary" />
-            {venue}
+          <p className="flex items-start gap-2">
+            <span className="w-2 h-2 mt-3 rounded-full bg-primary flex-shrink-0" />
+            <span>{venue}</span>
           </p>
           {schedule.map((line) => (
-            <p key={line} className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primary" />
-              {line}
+            <p key={line} className="flex items-start gap-2">
+              <span className="w-2 h-2 mt-3 rounded-full bg-primary flex-shrink-0" />
+              <span>{line}</span>
             </p>
           ))}
         </div>

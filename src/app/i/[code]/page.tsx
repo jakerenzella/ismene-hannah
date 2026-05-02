@@ -35,11 +35,16 @@ export async function generateMetadata({
   const description =
     "27 February 2027 in Melbourne — tap through to RSVP and see all the details.";
 
+  // Reuse the root opengraph-image.jpg convention file so invite previews
+  // share the same visual treatment as the homepage. Setting an explicit
+  // openGraph object would otherwise drop the convention image.
+  const images = ["/opengraph-image.jpg"];
+
   return {
     title,
     description,
-    openGraph: { title, description },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: { title, description, images },
+    twitter: { card: "summary_large_image", title, description, images },
     // Personal invite links shouldn't show up in search results.
     robots: { index: false, follow: false },
   };

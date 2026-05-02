@@ -41,7 +41,7 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
             className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
             href="#moodboard"
           >
-            Mood board
+            Dress code
           </a>
           <a
             className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors"
@@ -102,7 +102,7 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
             href="#moodboard"
             onClick={() => setMenuOpen(false)}
           >
-            Mood board
+            Dress code
           </a>
           <a
             className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors"

@@ -83,7 +83,7 @@ export default function Details({
               title="Reception"
               venue="Maharaja Palace, Northcote"
               schedule={["From 6:00 PM"]}
-              intro="From Ceres it's a short walk, Uber, or public-transport hop across to Northcote for dinner, drinks, and dancing."
+              intro="From Ceres, it's a 26 minute walk, 6 moinute Uber, or 13 minute bus ride to Northcote for dinner, drinks, and dancing."
               mapSrc="https://www.google.com/maps?q=Maharaja+Palace,+Northcote+VIC,+Australia&output=embed"
               mapTitle="Maharaja Palace map"
               mapTilt="1deg"

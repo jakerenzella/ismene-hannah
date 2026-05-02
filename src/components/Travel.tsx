@@ -1,34 +1,11 @@
 const suburbs = [
-  {
-    name: "Brunswick",
-    blurb:
-      "Closest to the ceremony at Ceres. Plenty of Airbnbs and bars stretching down Sydney Rd and Lygon St.",
-  },
-  {
-    name: "Northcote",
-    blurb:
-      "Walk-home territory from the reception. High St has the cafes, the bars, and the wine shops you want.",
-  },
-  {
-    name: "Fitzroy",
-    blurb:
-      "Roughly 10 minutes by Uber to either venue. Busiest food and drinks scene if you fancy a big night out.",
-  },
-  {
-    name: "Carlton",
-    blurb:
-      "Leafy and central, easy tram into the CBD. A short ride from both venues.",
-  },
-  {
-    name: "Collingwood",
-    blurb:
-      "Restaurants, breweries, and quick to either venue. Good base if you’re staying a few extra nights.",
-  },
-  {
-    name: "Thornbury",
-    blurb:
-      "Quieter, great cafes, walkable from the reception. Lovely if you’d rather a slower base.",
-  },
+  "Brunswick",
+  "Northcote",
+  "Fitzroy",
+  "Carlton",
+  "Collingwood",
+  "Thornbury",
+  "Preston",
 ];
 
 export default function Travel() {
@@ -42,27 +19,21 @@ export default function Travel() {
           Coming from out of town?
         </h2>
         <p className="text-lg md:text-xl text-on-surface-variant leading-relaxed">
-          Both venues are in Melbourne&apos;s inner north — Brunswick and
-          Northcote sit a short walk apart. Here are a few suburbs to look at if
+          Both venues are in Melbourne&apos;s inner north. Here are a few suburbs to look at if
           you&apos;re booking somewhere to stay.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        {suburbs.map((s, i) => (
-          <div
-            key={s.name}
-            className={`bg-surface-container-lowest p-6 rounded-2xl scrapbook-shadow border border-outline-variant/10 ${
+      <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+        {suburbs.map((name, i) => (
+          <span
+            key={name}
+            className={`bg-surface-container-lowest border border-primary/20 rounded-full px-5 py-2 font-headline font-bold text-lg text-primary scrapbook-shadow ${
               i % 2 === 0 ? "handwritten-tilt" : "handwritten-tilt-alt"
             }`}
           >
-            <h3 className="font-headline font-extrabold text-2xl text-primary mb-2">
-              {s.name}
-            </h3>
-            <p className="text-sm text-on-surface-variant leading-relaxed">
-              {s.blurb}
-            </p>
-          </div>
+            {name}
+          </span>
         ))}
       </div>
 

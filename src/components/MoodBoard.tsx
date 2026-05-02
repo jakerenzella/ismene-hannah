@@ -30,13 +30,29 @@ export default async function MoodBoard() {
     >
       <div className="text-center max-w-3xl mx-auto mb-12">
         <h2 className="font-display text-5xl md:text-6xl font-bold text-primary mb-6 handwritten-tilt-alt">
-          The Vibe
+          Dress code
         </h2>
-        <p className="text-lg md:text-xl text-on-surface-variant leading-relaxed">
-          Late-summer Melbourne, dappled grass, terracotta and burgundy, dancing
-          shoes you can stand in all night. Wear what makes you feel like
-          yourself — bright colour very welcome.
+        <p className="font-headline font-extrabold text-xl md:text-2xl text-on-surface mb-6">
+          Dress code: formal.
         </p>
+        <p className="text-lg md:text-xl text-on-surface-variant leading-relaxed">
+          Wear whatever sets your soul on fire, whether it be your Sunday best
+          or a white wedding dress (we won’t be, so you won’t upstage us). We
+          want you to feel confident, but if you need some inspo, we love bright
+          colours and bold patterns. Check out our mood board below.
+        </p>
+      </div>
+
+      <div className="max-w-sm mx-auto mb-12">
+        <Image
+          src="/assets/dress_code.jpg"
+          alt="Dress code mood board"
+          width={357}
+          height={633}
+          sizes="(max-width: 768px) 70vw, 380px"
+          className="w-full h-auto rounded-2xl scrapbook-shadow handwritten-tilt-alt"
+          priority={false}
+        />
       </div>
 
       {images.length > 0 && (

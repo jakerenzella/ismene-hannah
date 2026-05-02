@@ -28,7 +28,7 @@ export default function MenuSidebar({
     { label: "Our Wedding", anchor: "story" },
     { label: "RSVP", anchor: "rsvp" },
     { label: "Details", anchor: "details" },
-    { label: "Mood board", anchor: "moodboard" },
+    { label: "Dress code", anchor: "moodboard" },
     { label: "Travel", anchor: "travel" },
     ...(showNotes ? [{ label: "Notes wall", anchor: "notes" }] : []),
   ];

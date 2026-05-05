@@ -44,8 +44,8 @@ export default function OurStory({ code }: { code: string | null }) {
             with our most cherished family and friends. Our relationship began
             on a dancefloor 10 years ago, and boogying the night away is
             something that we still love to do together. So please bring your
-            dancing shoes, your best/worst singing voice, an adventurous spirit
-            and appetite for surprise twists. We can&apos;t wait to marry you!
+            dancing shoes, your best/worst singing voice and an appetite for
+            adventure.
           </p>
         </div>
       </div>

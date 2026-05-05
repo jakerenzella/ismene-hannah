@@ -14,7 +14,7 @@ export default function Details() {
             Venues
           </h2>
           <p className="mt-3 text-on-surface-variant text-base md:text-lg max-w-xl mx-auto">
-            Ceremony, reception are all within Melbourne&apos;s inner north.
+            Ceremony and reception are all within Melbourne&apos;s inner north.
           </p>
         </div>
 
@@ -27,7 +27,7 @@ export default function Details() {
               "Arrive 4:00 PM",
               "Ceremony begins 4:30 PM",
             ]}
-            intro="An outdoor ceremony on the grass at Ceres Environment Park. Comfortable shoes very welcome."
+            intro="An outdoor ceremony on the grass at Ceres Environment Park."
             parking="Parking is limited but there are spaces on Stewart Street (via the main entrance) or Lee Street (via the side entrance)."
             mapSrc="https://www.google.com/maps?q=CERES+Community+Environment+Park,+Lee+St,+Brunswick+East+VIC+3057,+Australia&output=embed"
             mapTitle="CERES Environment Park map"

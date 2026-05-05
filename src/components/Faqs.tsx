@@ -185,10 +185,6 @@ const FAQS: Faq[] = [
     ),
   },
   {
-    question: "Can I wear a white dress?",
-    answer: <p>Please do!</p>,
-  },
-  {
     question: "Will there be dancing?",
     answer: (
       <p>

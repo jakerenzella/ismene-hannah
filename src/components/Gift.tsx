@@ -16,9 +16,12 @@ export default function Gift() {
           A note on gifts
         </h2>
         <p className="text-lg text-on-surface-variant leading-relaxed mb-6 max-w-xl mx-auto">
-          Honestly, no presents needed — your company on the day is more than
-          enough. If you&apos;d still like to contribute something towards the
-          honeymoon, our PayID is below.
+          Your presence at our wedding means a lot to us, and we don&apos;t
+          expect any gifts. More than half of you are travelling from
+          interstate/overseas and we really appreciate the effort and cost
+          involved to make this happen. If you do want to contribute something,
+          you can transfer to the PAY ID below, but don&apos;t feel like you
+          need to.
         </p>
         <PayIdCopy
           display="0490 923 671"

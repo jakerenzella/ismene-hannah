@@ -87,9 +87,79 @@ describe("getInviteeByCode", () => {
 });
 
 describe("upsertRsvpForInvitee", () => {
-  it("creates a new RSVP when none exists for the invitee", async () => {
+  const noExisting = null;
+  const existingRecord = {
+    recordId: "rec_rsvp_existing",
+    attending: true,
+    attendees: ["Old Name"],
+    dietaries: [""],
+    dietary: "",
+    songRequests: "",
+  };
+
+  it("POSTs a new RSVP when caller passes existing=null", async () => {
     const fetchMock = mockFetchSequence([
-      { body: { records: [] } }, // findRsvpByInviteeId
+      { body: { id: "rec_rsvp_new", fields: {} } },
+    ]);
+
+    const { upsertRsvpForInvitee } = await import("./airtable");
+    const result = await upsertRsvpForInvitee("rec_invitee_1", validPayload, noExisting);
+
+    expect(result).toEqual({ recordId: "rec_rsvp_new", mode: "created" });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.method).toBe("POST");
+    const sentBody = JSON.parse(init.body as string);
+    expect(sentBody.typecast).toBe(true);
+    const sentFields = sentBody.fields;
+    expect(sentFields["Attendee names"]).toBe("Jane Smith\nJohn Smith");
+    expect(sentFields["Party size"]).toBe(2);
+    expect(sentFields["Dietary"]).toBe("Jane Smith: vegetarian");
+    expect(sentFields).not.toHaveProperty("Additional guests");
+  });
+
+  it("writes Party size 0 when declining", async () => {
+    const fetchMock = mockFetchSequence([
+      { body: { id: "rec_rsvp_new", fields: {} } },
+    ]);
+
+    const { upsertRsvpForInvitee } = await import("./airtable");
+    await upsertRsvpForInvitee(
+      "rec_invitee_1",
+      { ...validPayload, attending: "no", attendees: [], dietaries: [] },
+      noExisting
+    );
+
+    const sentFields = JSON.parse(
+      (fetchMock.mock.calls[0][1] as RequestInit).body as string
+    ).fields;
+    expect(sentFields["Attending"]).toBe(false);
+    expect(sentFields["Party size"]).toBe(0);
+    expect(sentFields["Attendee names"]).toBe("");
+  });
+
+  it("PATCHes the existing record id when caller passes one through", async () => {
+    const fetchMock = mockFetchSequence([
+      { body: { id: "rec_rsvp_existing", fields: {} } },
+    ]);
+
+    const { upsertRsvpForInvitee } = await import("./airtable");
+    const result = await upsertRsvpForInvitee(
+      "rec_invitee_1",
+      validPayload,
+      existingRecord
+    );
+
+    expect(result).toEqual({ recordId: "rec_rsvp_existing", mode: "updated" });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const call = fetchMock.mock.calls[0];
+    expect((call[1] as RequestInit).method).toBe("PATCH");
+    expect(call[0]).toContain("/rec_rsvp_existing");
+  });
+
+  it("falls back to its own lookup when caller didn't pre-fetch (existing=undefined)", async () => {
+    const fetchMock = mockFetchSequence([
+      { body: { records: [] } }, // fallback getExistingRsvpByCode
       { body: { id: "rec_rsvp_new", fields: {} } }, // POST
     ]);
 
@@ -98,66 +168,15 @@ describe("upsertRsvpForInvitee", () => {
 
     expect(result).toEqual({ recordId: "rec_rsvp_new", mode: "created" });
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    const postInit = fetchMock.mock.calls[1][1] as RequestInit;
-    expect(postInit.method).toBe("POST");
-    const sentBody = JSON.parse(postInit.body as string);
-    const sentFields = sentBody.fields;
-    expect(sentFields["Attendee names"]).toBe("Jane Smith\nJohn Smith");
-    expect(sentFields["Party size"]).toBe(2);
-    // Dietary becomes a per-attendee block, only listing those with requirements.
-    expect(sentFields["Dietary"]).toBe("Jane Smith: vegetarian");
-    expect(sentFields).not.toHaveProperty("Additional guests");
-    // typecast lets Airtable auto-create the Song requests column on first write.
-    expect(sentBody.typecast).toBe(true);
-  });
-
-  it("writes Party size 0 when declining", async () => {
-    const fetchMock = mockFetchSequence([
-      { body: { records: [] } },
-      { body: { id: "rec_rsvp_new", fields: {} } },
-    ]);
-
-    const { upsertRsvpForInvitee } = await import("./airtable");
-    await upsertRsvpForInvitee("rec_invitee_1", {
-      ...validPayload,
-      attending: "no",
-      attendees: [],
-      dietaries: [],
-    });
-
-    const sentFields = JSON.parse(
-      (fetchMock.mock.calls[1][1] as RequestInit).body as string
-    ).fields;
-    expect(sentFields["Attending"]).toBe(false);
-    expect(sentFields["Party size"]).toBe(0);
-    expect(sentFields["Attendee names"]).toBe("");
-  });
-
-  it("updates the existing RSVP when one is linked to the invitee", async () => {
-    const fetchMock = mockFetchSequence([
-      { body: { records: [{ id: "rec_rsvp_existing", fields: {} }] } },
-      { body: { id: "rec_rsvp_existing", fields: {} } },
-    ]);
-
-    const { upsertRsvpForInvitee } = await import("./airtable");
-    const result = await upsertRsvpForInvitee("rec_invitee_1", validPayload);
-
-    expect(result).toEqual({ recordId: "rec_rsvp_existing", mode: "updated" });
-    const patchCall = fetchMock.mock.calls[1];
-    expect((patchCall[1] as RequestInit).method).toBe("PATCH");
-    expect(patchCall[0]).toContain("/rec_rsvp_existing");
   });
 
   it("throws when the write fails", async () => {
-    mockFetchSequence([
-      { body: { records: [] } },
-      { status: 502, body: { error: "down" } },
-    ]);
+    mockFetchSequence([{ status: 502, body: { error: "down" } }]);
 
     const { upsertRsvpForInvitee } = await import("./airtable");
-    await expect(upsertRsvpForInvitee("rec_invitee_1", validPayload)).rejects.toThrow(
-      /Airtable 502/
-    );
+    await expect(
+      upsertRsvpForInvitee("rec_invitee_1", validPayload, noExisting)
+    ).rejects.toThrow(/Airtable 502/);
   });
 });
 
@@ -304,48 +323,6 @@ describe("Notes", () => {
     expect(JSON.parse(patchInit.body as string)).toEqual({
       fields: { "Heart count": 0 },
     });
-  });
-});
-
-describe("incrementInviteeSardineClicks", () => {
-  it("reads the current counter and PATCHes the new total", async () => {
-    const fetchMock = mockFetchSequence([
-      { body: { id: "rec_invitee_1", fields: { "Sardine clicks": 7 } } },
-      { body: { id: "rec_invitee_1", fields: {} } },
-    ]);
-
-    const { incrementInviteeSardineClicks } = await import("./airtable");
-    await incrementInviteeSardineClicks("rec_invitee_1", 3);
-
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    const patchInit = fetchMock.mock.calls[1][1] as RequestInit;
-    expect(patchInit.method).toBe("PATCH");
-    expect(JSON.parse(patchInit.body as string)).toEqual({
-      fields: { "Sardine clicks": 10 },
-    });
-  });
-
-  it("treats a missing field as zero", async () => {
-    const fetchMock = mockFetchSequence([
-      { body: { id: "rec_invitee_1", fields: {} } },
-      { body: { id: "rec_invitee_1", fields: {} } },
-    ]);
-
-    const { incrementInviteeSardineClicks } = await import("./airtable");
-    await incrementInviteeSardineClicks("rec_invitee_1", 5);
-
-    const patchInit = fetchMock.mock.calls[1][1] as RequestInit;
-    expect(JSON.parse(patchInit.body as string)).toEqual({
-      fields: { "Sardine clicks": 5 },
-    });
-  });
-
-  it("does nothing when delta is zero or negative", async () => {
-    const fetchMock = mockFetchSequence([]);
-    const { incrementInviteeSardineClicks } = await import("./airtable");
-    await incrementInviteeSardineClicks("rec_invitee_1", 0);
-    await incrementInviteeSardineClicks("rec_invitee_1", -1);
-    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 

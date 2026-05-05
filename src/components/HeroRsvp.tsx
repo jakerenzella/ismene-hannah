@@ -78,6 +78,17 @@ export default function HeroRsvp({
               </span>
             </button>
           )}
+          {existingRsvp && (
+            <a
+              href="#notes"
+              className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-transparent text-on-surface font-headline font-extrabold py-3 px-6 rounded-full border-2 border-primary/30 hover:border-primary hover:text-primary active:scale-95 transition-all text-base group"
+            >
+              Leave a note
+              <span className="material-symbols-outlined text-lg group-hover:translate-y-0.5 transition-transform">
+                arrow_downward
+              </span>
+            </a>
+          )}
         </div>
       </div>
 
@@ -130,6 +141,7 @@ export default function HeroRsvp({
                       existingRsvp={existingRsvp}
                       rsvpClosed={rsvpClosed}
                       deadlineLabel={deadlineLabel}
+                      onClose={() => setIsOpen(false)}
                     />
                   </div>
                 </motion.div>

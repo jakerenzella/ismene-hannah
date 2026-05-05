@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+import { cache } from "react";
 import type { Invitee, RsvpInput } from "./rsvp-schema";
 import type { NoteColor, NoteInput, ReactionType } from "./notes-schema";
 
@@ -13,7 +15,6 @@ type InviteeFields = {
   Code: string;
   Household: string;
   "Max party size"?: number;
-  "Sardine clicks"?: number;
 };
 
 type RsvpFields = {
@@ -38,7 +39,13 @@ function tableUrl(table: string): string {
   return `${AIRTABLE_API_BASE}/${env("AIRTABLE_BASE_ID")}/${encodeURIComponent(table)}`;
 }
 
-async function airtableFetch(url: string, init: RequestInit = {}): Promise<Response> {
+async function airtableFetch(
+  url: string,
+  init: RequestInit & { cache?: RequestCache } = {}
+): Promise<Response> {
+  // Reads wrapped in unstable_cache pass through with the default no-store
+  // (the outer cache layer handles correctness). Writes also use no-store
+  // since we never want a stale POST/PATCH cached at the HTTP layer.
   const response = await fetch(url, {
     ...init,
     headers: {
@@ -46,7 +53,7 @@ async function airtableFetch(url: string, init: RequestInit = {}): Promise<Respo
       "Content-Type": "application/json",
       ...(init.headers ?? {}),
     },
-    cache: "no-store",
+    cache: init.cache ?? "no-store",
   });
   if (!response.ok) {
     const body = await response.text().catch(() => "");
@@ -55,7 +62,7 @@ async function airtableFetch(url: string, init: RequestInit = {}): Promise<Respo
   return response;
 }
 
-export async function getInviteeByCode(code: string): Promise<Invitee | null> {
+async function fetchInviteeByCode(code: string): Promise<Invitee | null> {
   const table = env("AIRTABLE_INVITEES_TABLE");
   const formula = encodeURIComponent(`{Code} = "${code.replace(/"/g, "")}"`);
   const url = `${tableUrl(table)}?filterByFormula=${formula}&maxRecords=1`;
@@ -71,11 +78,20 @@ export async function getInviteeByCode(code: string): Promise<Invitee | null> {
   };
 }
 
-/**
- * Read-then-PATCH increment of the "Sardine clicks" counter on an Invitee.
- * Airtable has no atomic increment; concurrent updates may lose a tick. That's
- * acceptable for a fun click counter — we just want a rough leaderboard.
- */
+const cachedInviteeByCode = (code: string) =>
+  unstable_cache(
+    () => fetchInviteeByCode(code),
+    ["invitee", code],
+    { tags: ["invitees", `invitee:${code}`], revalidate: 3600 }
+  )();
+
+// react cache() dedupes truly identical calls within a single render
+// (e.g. generateMetadata + the page component on /i/[code]). Cross-request
+// caching is handled by the inner unstable_cache layer.
+export const getInviteeByCode = cache(
+  (code: string): Promise<Invitee | null> => cachedInviteeByCode(code)
+);
+
 // ============================================================
 // Notes
 // ============================================================
@@ -105,10 +121,9 @@ export type Note = {
   mine: boolean;
 };
 
-function parseNoteRecord(
-  record: AirtableRecord<NoteFields>,
-  myInviteeId: string | null
-): Note {
+type RawNote = Omit<Note, "mine"> & { linkedInviteeIds: string[] };
+
+function parseRawNote(record: AirtableRecord<NoteFields>): RawNote {
   return {
     id: record.id,
     authorName: record.fields["Author name"] ?? "",
@@ -118,16 +133,11 @@ function parseNoteRecord(
     hearts: record.fields["Heart count"] ?? 0,
     sparkles: record.fields["Sparkle count"] ?? 0,
     laughs: record.fields["Laugh count"] ?? 0,
-    mine: !!myInviteeId && (record.fields.Invitee ?? []).includes(myInviteeId),
+    linkedInviteeIds: record.fields.Invitee ?? [],
   };
 }
 
-/**
- * Returns visible notes (Hidden != true), newest first.
- * If `myInviteeId` is provided, each note is tagged with `mine: true`
- * when it's linked to that invitee, so the UI can show delete controls.
- */
-export async function getNotes(myInviteeId: string | null = null): Promise<Note[]> {
+const fetchNotesRaw = async (): Promise<RawNote[]> => {
   const table = process.env.AIRTABLE_NOTES_TABLE;
   if (!table) return [];
   const formula = encodeURIComponent("NOT({Hidden})");
@@ -135,10 +145,28 @@ export async function getNotes(myInviteeId: string | null = null): Promise<Note[
   const url = `${tableUrl(table)}?filterByFormula=${formula}&pageSize=100&${sort}`;
   const response = await airtableFetch(url);
   const data = (await response.json()) as { records: AirtableRecord<NoteFields>[] };
-  return data.records.map((r) => parseNoteRecord(r, myInviteeId));
+  return data.records.map(parseRawNote);
+};
+
+const getNotesRaw = unstable_cache(
+  fetchNotesRaw,
+  ["notes-raw"],
+  { tags: ["notes"], revalidate: 86400 }
+);
+
+/**
+ * Returns visible notes (Hidden != true), newest first. The cached layer is
+ * viewer-agnostic; the per-viewer `mine` flag is computed on each call.
+ */
+export async function getNotes(myInviteeId: string | null = null): Promise<Note[]> {
+  const raw = await getNotesRaw();
+  return raw.map(({ linkedInviteeIds, ...rest }) => ({
+    ...rest,
+    mine: !!myInviteeId && linkedInviteeIds.includes(myInviteeId),
+  }));
 }
 
-export async function getNoteCountForInvitee(inviteeId: string): Promise<number> {
+const fetchNoteCountForInvitee = async (inviteeId: string): Promise<number> => {
   const table = process.env.AIRTABLE_NOTES_TABLE;
   if (!table) return 0;
   const formula = encodeURIComponent(`AND(NOT({Hidden}), FIND("${inviteeId.replace(/"/g, "")}", ARRAYJOIN({Invitee})))`);
@@ -146,7 +174,14 @@ export async function getNoteCountForInvitee(inviteeId: string): Promise<number>
   const response = await airtableFetch(url);
   const data = (await response.json()) as { records: AirtableRecord<NoteFields>[] };
   return data.records.length;
-}
+};
+
+export const getNoteCountForInvitee = (inviteeId: string) =>
+  unstable_cache(
+    () => fetchNoteCountForInvitee(inviteeId),
+    ["note-count", inviteeId],
+    { tags: [`note-count:${inviteeId}`], revalidate: 86400 }
+  )();
 
 export async function createNote(
   inviteeId: string,
@@ -167,7 +202,8 @@ export async function createNote(
     body: JSON.stringify({ fields, typecast: true }),
   });
   const data = (await response.json()) as AirtableRecord<NoteFields>;
-  return parseNoteRecord(data, inviteeId);
+  const { linkedInviteeIds, ...rest } = parseRawNote(data);
+  return { ...rest, mine: linkedInviteeIds.includes(inviteeId) };
 }
 
 export async function getNoteOwnerInviteeId(noteId: string): Promise<string | null> {
@@ -204,22 +240,6 @@ export async function adjustNoteReaction(
   await airtableFetch(url, {
     method: "PATCH",
     body: JSON.stringify({ fields: { [field]: next } }),
-  });
-}
-
-export async function incrementInviteeSardineClicks(
-  inviteeId: string,
-  delta: number
-): Promise<void> {
-  if (delta <= 0) return;
-  const table = env("AIRTABLE_INVITEES_TABLE");
-  const url = `${tableUrl(table)}/${inviteeId}`;
-  const getRes = await airtableFetch(url);
-  const data = (await getRes.json()) as AirtableRecord<InviteeFields>;
-  const current = data.fields["Sardine clicks"] ?? 0;
-  await airtableFetch(url, {
-    method: "PATCH",
-    body: JSON.stringify({ fields: { "Sardine clicks": current + delta } }),
   });
 }
 
@@ -274,7 +294,7 @@ function formatDietariesForStorage(attendees: string[], dietaries: string[]): st
   return lines.join("\n");
 }
 
-export async function getExistingRsvpByCode(code: string): Promise<ExistingRsvp | null> {
+async function fetchExistingRsvpByCode(code: string): Promise<ExistingRsvp | null> {
   const table = env("AIRTABLE_RSVPS_TABLE");
   // {Invitee} is a linked field. In Airtable formulas, linked fields evaluate to
   // their *primary field* of the linked record (here: the Code), not the record id.
@@ -303,6 +323,13 @@ export async function getExistingRsvpByCode(code: string): Promise<ExistingRsvp 
   };
 }
 
+export const getExistingRsvpByCode = (code: string) =>
+  unstable_cache(
+    () => fetchExistingRsvpByCode(code),
+    ["rsvp", code],
+    { tags: ["rsvps", `rsvp:${code}`], revalidate: 86400 }
+  )();
+
 function buildRsvpFields(inviteeId: string, payload: RsvpInput): RsvpFields {
   const attending = payload.attending === "yes";
   const dietaryText = attending
@@ -319,19 +346,27 @@ function buildRsvpFields(inviteeId: string, payload: RsvpInput): RsvpFields {
   };
 }
 
+/**
+ * Find-then-write upsert. The caller (`submitRsvp`) usually has an `existing`
+ * record on hand from its no-op detection step — passing it through means we
+ * skip a duplicate Airtable read here. When `existing` is undefined, we fall
+ * back to a fresh lookup (rare: only when the caller's lookup itself failed).
+ *
+ * We can't use Airtable's `performUpsert` primitive because the natural merge
+ * key (the `Invitee` linked-record field) is rejected with
+ * `UNSUPPORTED_FIELD_TYPE_TO_UPSERT` — it only accepts text/numeric merge fields.
+ */
 export async function upsertRsvpForInvitee(
   inviteeId: string,
-  payload: RsvpInput
+  payload: RsvpInput,
+  existing?: ExistingRsvp | null
 ): Promise<{ recordId: string; mode: "created" | "updated" }> {
   const table = env("AIRTABLE_RSVPS_TABLE");
   const fields = buildRsvpFields(inviteeId, payload);
-  const existing = await getExistingRsvpByCode(payload.code);
+  const known = existing !== undefined ? existing : await getExistingRsvpByCode(payload.code);
 
-  // typecast: true lets Airtable accept the request even if a brand-new column
-  // (e.g. Song requests) hasn't been added by hand yet — it auto-creates the
-  // missing column on first write rather than 422'ing.
-  if (existing) {
-    const response = await airtableFetch(`${tableUrl(table)}/${existing.recordId}`, {
+  if (known) {
+    const response = await airtableFetch(`${tableUrl(table)}/${known.recordId}`, {
       method: "PATCH",
       body: JSON.stringify({ fields, typecast: true }),
     });
@@ -390,24 +425,39 @@ export function endOfWeddingDay(dateStr: string): Date {
  * Reads site-wide settings from the Airtable Settings table (single row).
  * Fail-open: any error or missing config returns a permissive default,
  * so a settings-table outage cannot block guests from RSVPing.
+ *
+ * Returned shape uses epoch ms instead of a Date because `unstable_cache`
+ * serializes via JSON — a `Date` would round-trip to a string and break
+ * `getTime()` on the consumer side.
  */
-export async function getSettings(): Promise<Settings> {
+async function fetchRawSettings(): Promise<{ deadlineMs: number | null }> {
   // Accept both spellings; the rest of the schema uses plural ("Invitees", "RSVPs").
   const table = process.env.AIRTABLE_SETTINGS_TABLE ?? process.env.AIRTABLE_SETTING_TABLE;
-  if (!table) return { rsvpDeadline: null };
+  if (!table) return { deadlineMs: null };
 
   try {
     const url = `${tableUrl(table)}?maxRecords=1`;
     const response = await airtableFetch(url);
     const data = (await response.json()) as { records: AirtableRecord<SettingsFields>[] };
     const dateStr = data.records[0]?.fields["RSVP deadline"];
-    if (!dateStr) return { rsvpDeadline: null };
-    const deadline = endOfWeddingDay(dateStr);
-    return { rsvpDeadline: Number.isNaN(deadline.getTime()) ? null : deadline };
+    if (!dateStr) return { deadlineMs: null };
+    const ms = endOfWeddingDay(dateStr).getTime();
+    return { deadlineMs: Number.isNaN(ms) ? null : ms };
   } catch (error) {
     console.error("[settings] fetch failed", error);
-    return { rsvpDeadline: null };
+    return { deadlineMs: null };
   }
+}
+
+const getRawSettings = unstable_cache(
+  fetchRawSettings,
+  ["settings"],
+  { tags: ["settings"], revalidate: 86400 }
+);
+
+export async function getSettings(): Promise<Settings> {
+  const { deadlineMs } = await getRawSettings();
+  return { rsvpDeadline: deadlineMs == null ? null : new Date(deadlineMs) };
 }
 
 export function isPastDeadline(deadline: Date | null, now: Date = new Date()): boolean {

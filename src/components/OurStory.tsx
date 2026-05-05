@@ -1,7 +1,7 @@
 import Image from "next/image";
 import FishSwarm from "@/components/FishSwarm";
 
-export default function OurStory({ code }: { code: string | null }) {
+export default function OurStory() {
   return (
     <section
       className="bg-surface-container-low/50 py-16 relative scroll-mt-24"
@@ -10,7 +10,7 @@ export default function OurStory({ code }: { code: string | null }) {
       <div className="max-w-4xl lg:max-w-5xl mx-auto px-6 text-center relative z-10">
         {/* Decorative fish */}
         <div className="mb-8 flex justify-center">
-          <FishSwarm code={code}>
+          <FishSwarm>
             <Image
               src="/assets/fish.svg"
               alt=""

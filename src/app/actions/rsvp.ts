@@ -1,12 +1,15 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import {
+  getExistingRsvpByCode,
   getInviteeByCode,
   getSettings,
   isPastDeadline,
   upsertRsvpForInvitee,
+  type ExistingRsvp,
 } from "@/lib/airtable";
-import { parseFormData, RsvpInputSchema } from "@/lib/rsvp-schema";
+import { parseFormData, RsvpInputSchema, type RsvpInput } from "@/lib/rsvp-schema";
 import type { RsvpState } from "./rsvp-state";
 
 export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<RsvpState> {
@@ -66,9 +69,32 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
     };
   }
 
+  // No-op short-circuit: if the new payload exactly matches the stored RSVP,
+  // skip the upsert entirely. This is a cache hit (the homepage just fetched
+  // it), so no extra Airtable cost — and it saves the write on accidental
+  // re-submits or "Update RSVP" presses with no edits.
+  //
+  // We also pass the result through to upsertRsvpForInvitee so it doesn't
+  // re-fetch — that's what keeps the submit flow at 1 write per call.
+  let existing: ExistingRsvp | null = null;
+  let lookupOk = false;
+  try {
+    existing = await getExistingRsvpByCode(payload.code);
+    lookupOk = true;
+  } catch (error) {
+    console.error("[rsvp] existing-rsvp lookup failed", { error, code: payload.code });
+  }
+  if (existing && rsvpUnchanged(existing, payload)) {
+    return { status: "ok", mode: "updated" };
+  }
+
   let mode: "created" | "updated";
   try {
-    const result = await upsertRsvpForInvitee(invitee.id, payload);
+    const result = await upsertRsvpForInvitee(
+      invitee.id,
+      payload,
+      lookupOk ? existing : undefined
+    );
     mode = result.mode;
   } catch (error) {
     console.error("[rsvp] airtable write failed", { error, payload });
@@ -79,7 +105,25 @@ export async function submitRsvp(_prev: RsvpState, formData: FormData): Promise<
     };
   }
 
+  // Refresh the cached existing-RSVP entry so subsequent page loads see the
+  // new state without burning calls until next user-driven invalidation.
+  updateTag(`rsvp:${payload.code}`);
+
   return { status: "ok", mode };
+}
+
+function rsvpUnchanged(existing: ExistingRsvp, payload: RsvpInput): boolean {
+  if (existing.attending !== (payload.attending === "yes")) return false;
+  if ((existing.songRequests ?? "").trim() !== (payload.songRequests ?? "").trim()) return false;
+  // For "no" responses, the attendee/dietary arrays don't matter — Airtable
+  // stores empty strings either way.
+  if (payload.attending === "no") return true;
+  if (existing.attendees.length !== payload.attendees.length) return false;
+  for (let i = 0; i < payload.attendees.length; i++) {
+    if (existing.attendees[i] !== payload.attendees[i]) return false;
+    if ((existing.dietaries[i] ?? "").trim() !== (payload.dietaries[i] ?? "").trim()) return false;
+  }
+  return true;
 }
 
 async function safeGetInvitee(code: string) {

@@ -1,5 +1,6 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import {
   adjustNoteReaction,
   createNote,
@@ -96,6 +97,8 @@ export async function postNote(_prev: NoteFormState, formData: FormData): Promis
       message: payload.message,
       color: payload.color,
     });
+    updateTag("notes");
+    updateTag(`note-count:${invitee.id}`);
     return { status: "ok", note };
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
@@ -124,6 +127,8 @@ export async function deleteNoteAction(noteId: string, code: string): Promise<De
     const owner = await getNoteOwnerInviteeId(noteId);
     if (owner !== invitee.id) return { ok: false, reason: "NOT_OWNER" };
     await deleteNote(noteId);
+    updateTag("notes");
+    updateTag(`note-count:${invitee.id}`);
     return { ok: true };
   } catch (error) {
     console.error("[notes] delete failed", { error, noteId });
@@ -152,6 +157,7 @@ export async function reactToNoteAction(
     const invitee = await getInviteeByCode(cleanCode);
     if (!invitee) return { ok: false, reason: "INVALID_CODE" };
     await adjustNoteReaction(noteId, type, delta);
+    updateTag("notes");
     return { ok: true };
   } catch (error) {
     console.error("[notes] react failed", { error, noteId, type, delta });

@@ -98,7 +98,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           rsvpClosed={rsvpClosed}
           deadlineLabel={deadlineLabel}
         />
-        <OurStory code={invitee?.code ?? null} />
+        <OurStory />
         <Details />
         <MoodBoard />
         {invitee && <Gift />}

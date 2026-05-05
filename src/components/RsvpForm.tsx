@@ -17,6 +17,8 @@ type CardProps = {
   existingRsvp: ExistingRsvp | null;
   rsvpClosed: boolean;
   deadlineLabel: string | null;
+  /** Optional: when set, the success state shows a "Close" button that calls this. */
+  onClose?: () => void;
 };
 
 export function RsvpCard({
@@ -25,6 +27,7 @@ export function RsvpCard({
   existingRsvp,
   rsvpClosed,
   deadlineLabel,
+  onClose,
 }: CardProps) {
   if (invalidCode) {
     return (
@@ -78,19 +81,26 @@ export function RsvpCard({
     );
   }
 
-  return <RsvpForm invitee={invitee} existingRsvp={existingRsvp} deadlineLabel={deadlineLabel} />;
+  return (
+    <RsvpForm
+      invitee={invitee}
+      existingRsvp={existingRsvp}
+      deadlineLabel={deadlineLabel}
+      onClose={onClose}
+    />
+  );
 }
 
 export function RsvpForm({
   invitee,
   existingRsvp,
   deadlineLabel,
-  onSuccess,
+  onClose,
 }: {
   invitee: Invitee;
   existingRsvp: ExistingRsvp | null;
   deadlineLabel: string | null;
-  onSuccess?: () => void;
+  onClose?: () => void;
 }) {
   const router = useRouter();
   const [state, action, pending] = useActionState(submitRsvp, initialRsvpState);
@@ -151,14 +161,13 @@ export function RsvpForm({
             ? "We've updated your RSVP."
             : "We can't wait to celebrate with you."}
         </p>
-        <a
-          href="#notes"
-          onClick={onSuccess}
-          className="inline-flex items-center justify-center gap-2 bg-primary-container/40 text-on-surface font-headline font-extrabold py-3 px-6 rounded-full hover:scale-[1.03] active:scale-95 transition-all text-base border-2 border-primary/20"
+        <button
+          type="button"
+          onClick={onClose}
+          className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-headline font-extrabold py-3 px-8 rounded-full shadow-md hover:scale-[1.03] active:scale-95 transition-all text-base"
         >
-          Leave a note for us
-          <span className="material-symbols-outlined text-lg">arrow_downward</span>
-        </a>
+          Close
+        </button>
       </div>
     );
   }

@@ -10,6 +10,7 @@ import Notes from "@/components/Notes";
 import Footer from "@/components/Footer";
 import Sticker from "@/components/Sticker";
 import ScatteredStickers from "@/components/ScatteredStickers";
+import ScrollToTopOnMount from "@/components/ScrollToTopOnMount";
 import {
   getExistingRsvpByCode,
   getInviteeByCode,
@@ -87,6 +88,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   return (
     <>
       <Navbar showNotes={!!invitee} />
+      <ScrollToTopOnMount />
       <ScatteredStickers />
       <main className="pt-12 relative z-10">
         <Hero

@@ -38,7 +38,7 @@ export default function Travel() {
       </div>
 
       <div className="mt-12 max-w-3xl mx-auto bg-surface-container/30 border border-outline-variant/20 rounded-2xl p-6 backdrop-blur-sm flex gap-4 items-start">
-        <div className="bg-primary-container/30 p-3 rounded-xl rotate-[-5deg] flex-shrink-0 flex items-center justify-center">
+        <div className="bg-primary-container/30 p-3 rounded-xl rotate-[-5deg] shrink-0 flex items-center justify-center">
           <span
             className="material-symbols-outlined text-primary text-[32px] leading-none"
             style={{ fontVariationSettings: '"FILL" 0, "wght" 700, "GRAD" 200' }}

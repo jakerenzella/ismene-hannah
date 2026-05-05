@@ -187,11 +187,22 @@ export function RsvpForm({
   );
   const [songRequests, setSongRequests] = useState<string>(existingRsvp?.songRequests ?? "");
   const [editing, setEditing] = useState<boolean>(!existingRsvp);
+  const [clientFieldErrors, setClientFieldErrors] = useState<Record<string, string[]>>({});
 
   function setAttendeeAt(index: number, value: string) {
     setAttendees((prev) => {
       const next = [...prev];
       next[index] = value;
+      return next;
+    });
+    if (value.trim().length > 0) clearClientError("attendees");
+  }
+
+  function clearClientError(key: string) {
+    setClientFieldErrors((prev) => {
+      if (!(key in prev)) return prev;
+      const next = { ...prev };
+      delete next[key];
       return next;
     });
   }
@@ -219,7 +230,7 @@ export function RsvpForm({
           onClick={onClose}
           className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-headline font-extrabold py-3 px-8 rounded-full shadow-md hover:scale-[1.03] active:scale-95 transition-all text-base"
         >
-          Close
+          Back to site
         </button>
       </div>
     );
@@ -235,10 +246,39 @@ export function RsvpForm({
     );
   }
 
-  const fieldErrors = state.status === "error" ? state.fieldErrors ?? {} : {};
   const showAttendeeFields = attending === "yes";
   const cappedPartySize = Math.min(partySize, invitee.maxPartySize);
   const nameSlots = Array.from({ length: cappedPartySize }, (_, i) => i);
+  // Client-side errors take precedence: when they exist we never round-trip
+  // to the server, which avoids React 19's form-action reset behaviour from
+  // visually un-checking the controlled radio.
+  const fieldErrors =
+    Object.keys(clientFieldErrors).length > 0
+      ? clientFieldErrors
+      : state.status === "error"
+        ? state.fieldErrors ?? {}
+        : {};
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    const errors: Record<string, string[]> = {};
+    if (attending === null) {
+      errors.attending = ["Please choose yes or no"];
+    }
+    if (attending === "yes") {
+      const filledNames = nameSlots
+        .map((i) => (attendees[i] ?? "").trim())
+        .filter((n) => n.length > 0);
+      if (filledNames.length === 0) {
+        errors.attendees = ["Please enter at least one name"];
+      }
+    }
+    if (Object.keys(errors).length > 0) {
+      e.preventDefault();
+      setClientFieldErrors(errors);
+    } else {
+      setClientFieldErrors({});
+    }
+  }
 
   return (
     <div>
@@ -256,7 +296,7 @@ export function RsvpForm({
         </p>
       )}
 
-      <form className="space-y-5 text-left mt-4" action={action} noValidate>
+      <form className="space-y-5 text-left mt-4" action={action} onSubmit={handleSubmit} noValidate>
         <input type="hidden" name="code" value={invitee.code} />
         <input
           type="text"
@@ -273,7 +313,10 @@ export function RsvpForm({
             value="yes"
             required
             checked={attending === "yes"}
-            onChange={() => setAttending("yes")}
+            onChange={() => {
+              setAttending("yes");
+              clearClientError("attending");
+            }}
           >
             Joyfully Accept
           </RadioOption>
@@ -281,7 +324,11 @@ export function RsvpForm({
             name="attending"
             value="no"
             checked={attending === "no"}
-            onChange={() => setAttending("no")}
+            onChange={() => {
+              setAttending("no");
+              clearClientError("attending");
+              clearClientError("attendees");
+            }}
           >
             Regretfully Decline
           </RadioOption>

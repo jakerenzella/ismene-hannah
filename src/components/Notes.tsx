@@ -74,7 +74,7 @@ export default function Notes({ notes: initialNotes, code, household, hasRsvp }:
           The Notes Wall
         </h2>
         <p className="text-on-surface-variant text-lg max-w-xl mx-auto">
-          Leave a sweet message — visible to everyone with an invite. Memories, advice, song
+          Leave a sweet message, visible to everyone with an invite. Memories, advice, song
           requests, anything.
         </p>
       </div>

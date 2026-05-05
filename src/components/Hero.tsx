@@ -76,10 +76,12 @@ export default function Hero({ invitee, invalidCode, existingRsvp, rsvpClosed, d
             <Image
               src="/assets/watercolour.png"
               alt="Ismene and Hannah"
-              width={800}
-              height={800}
+              width={1920}
+              height={2773}
+              sizes="(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 600px"
               className="w-full h-auto rounded-md"
               priority
+              fetchPriority="high"
             />
           </div>
         </div>

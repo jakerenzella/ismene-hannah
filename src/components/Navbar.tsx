@@ -10,7 +10,7 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
     <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm shadow-surface-container/50">
       <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
         <a
-          className="text-2xl font-bold tracking-tighter text-primary font-headline whitespace-nowrap"
+          className="text-3xl md:text-4xl font-bold text-primary font-display whitespace-nowrap"
           style={{ transform: "rotate(-1deg)" }}
           href="#"
         >
@@ -20,38 +20,38 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
         {/* Desktop nav */}
         <div className="hidden md:flex gap-4 lg:gap-8 items-center">
           <a
-            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#story"
           >
             Wedding
           </a>
           <a
-            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#details"
           >
             Details
           </a>
           <a
-            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#moodboard"
           >
             Dress code
           </a>
           <a
-            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#travel"
           >
             Travel
           </a>
           <a
-            className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#faqs"
           >
             FAQs
           </a>
           {showNotes && (
             <a
-              className="font-headline tracking-tight text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+              className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
               href="#notes"
             >
               Notes wall
@@ -77,35 +77,35 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
       {menuOpen && (
         <div className="md:hidden px-6 pb-4 flex flex-col gap-4 bg-surface/95 backdrop-blur-md">
           <a
-            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#story"
             onClick={() => setMenuOpen(false)}
           >
             Wedding
           </a>
           <a
-            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#details"
             onClick={() => setMenuOpen(false)}
           >
             Details
           </a>
           <a
-            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#moodboard"
             onClick={() => setMenuOpen(false)}
           >
             Dress code
           </a>
           <a
-            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#travel"
             onClick={() => setMenuOpen(false)}
           >
             Travel
           </a>
           <a
-            className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+            className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#faqs"
             onClick={() => setMenuOpen(false)}
           >
@@ -113,7 +113,7 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
           </a>
           {showNotes && (
             <a
-              className="font-headline text-lg text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
+              className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
               href="#notes"
               onClick={() => setMenuOpen(false)}
             >

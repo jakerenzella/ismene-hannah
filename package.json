@@ -12,6 +12,8 @@
     "seed:invitees": "tsx scripts/seed-invitees.ts"
   },
   "dependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "canvas-confetti": "^1.9.4",
     "howler": "^2.2.4",
     "motion": "^12.38.0",
     "nanoid": "^5.1.11",

@@ -8,6 +8,54 @@ import { initialRsvpState, type RsvpState } from "@/app/actions/rsvp-state";
 import type { ExistingRsvp } from "@/lib/airtable";
 import type { Invitee } from "@/lib/rsvp-schema";
 
+async function fireAttendingConfetti() {
+  if (typeof document === "undefined") return;
+  const { default: confetti } = await import("canvas-confetti");
+
+  // canvas-confetti's built-in canvas uses z-index: 100, which sits beneath
+  // our RSVP drawer (z-[110]). Mount our own canvas at z-[200] so the burst
+  // plays over the drawer — and survives the drawer being closed mid-burst,
+  // since the canvas lives directly on <body>.
+  let canvas = document.querySelector<HTMLCanvasElement>("canvas[data-confetti-cannon]");
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.dataset.confettiCannon = "true";
+    canvas.style.cssText =
+      "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:200;";
+    document.body.appendChild(canvas);
+  }
+
+  const cannon = confetti.create(canvas, { resize: true, useWorker: true });
+  const colors = ["#b91c1c", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#ffffff"];
+  // Two synchronised cannons firing inward from the bottom corners — the
+  // canonical canvas-confetti "cannon" pattern.
+  const fire = (originX: number, angle: number) => {
+    cannon({
+      particleCount: 80,
+      spread: 70,
+      angle,
+      startVelocity: 55,
+      origin: { x: originX, y: 1 },
+      colors,
+      scalar: 1.1,
+      ticks: 250,
+    });
+    cannon({
+      particleCount: 40,
+      spread: 100,
+      angle,
+      startVelocity: 35,
+      origin: { x: originX, y: 1 },
+      colors,
+      scalar: 0.9,
+      decay: 0.92,
+      ticks: 220,
+    });
+  };
+  fire(0.1, 60);
+  fire(0.9, 120);
+}
+
 const inputClasses =
   "w-full bg-transparent border-b-2 border-outline-variant focus:border-primary focus:ring-0 focus:outline-none transition-all px-0 py-3 text-lg text-on-surface placeholder:text-on-surface-variant/70";
 
@@ -107,13 +155,6 @@ export function RsvpForm({
   // Refresh server data once after a successful RSVP so downstream sections
   // (the Notes composer, in particular) see the new RSVP and unlock without
   // requiring the guest to reload the page.
-  const lastRefreshedRef = useRef<RsvpState | null>(null);
-  useEffect(() => {
-    if (state.status === "ok" && lastRefreshedRef.current !== state) {
-      lastRefreshedRef.current = state;
-      router.refresh();
-    }
-  }, [state, router]);
   const initialAttending: "yes" | "no" | null = existingRsvp
     ? existingRsvp.attending
       ? "yes"
@@ -124,6 +165,18 @@ export function RsvpForm({
     : 1;
   const [attending, setAttending] = useState<"yes" | "no" | null>(initialAttending);
   const [partySize, setPartySize] = useState<number>(initialPartySize);
+  const lastRefreshedRef = useRef<RsvpState | null>(null);
+  useEffect(() => {
+    if (state.status === "ok" && lastRefreshedRef.current !== state) {
+      lastRefreshedRef.current = state;
+      router.refresh();
+      // Celebrate accepts with a confetti cannon. Decline submissions get
+      // the same Thank-you panel, sans confetti.
+      if (attending === "yes") {
+        fireAttendingConfetti().catch(() => {});
+      }
+    }
+  }, [state, router, attending]);
   // Controlled inputs so the form survives validation re-renders
   // (React 19 auto-resets uncontrolled forms after action submit).
   const [attendees, setAttendees] = useState<string[]>(() =>

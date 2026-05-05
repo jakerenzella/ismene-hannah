@@ -9,22 +9,31 @@ export default function Navbar({ showNotes = false }: { showNotes?: boolean }) {
   return (
     <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm shadow-surface-container/50">
       <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
-        <a
-          className="text-3xl md:text-4xl font-bold text-primary font-display whitespace-nowrap"
-          style={{ transform: "rotate(-1deg)" }}
-          href="#"
-        >
-          Ismene + Hannah
-        </a>
+        <div className="flex items-center gap-3 lg:gap-4 min-w-0">
+          <a
+            className="text-3xl md:text-4xl font-bold text-primary font-display whitespace-nowrap"
+            style={{ transform: "rotate(-1deg)" }}
+            href="#"
+          >
+            Ismene + Hannah
+          </a>
+          <span
+            className="hidden md:inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/40 border border-secondary/30 text-sm lg:text-base font-headline font-extrabold text-secondary whitespace-nowrap"
+            style={{ transform: "rotate(2deg)" }}
+            aria-label="27 February 2027"
+          >
+            27.02.27
+          </span>
+        </div>
 
         {/* Desktop nav */}
         <div className="hidden md:flex gap-4 lg:gap-8 items-center">
-          <a
+          {/* <a
             className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#story"
           >
             Wedding
-          </a>
+          </a> */}
           <a
             className="font-display font-bold text-2xl text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
             href="#details"

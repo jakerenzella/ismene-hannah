@@ -40,11 +40,12 @@ export default function OurStory({ code }: { code: string | null }) {
             className="text-[1.3rem] md:text-[1.8rem] lg:text-[2.4rem] leading-[115%] text-on-surface-variant mb-12 px-4"
             style={{ fontFamily: "'Esteban', serif", letterSpacing: "-0.05em" }}
           >
-            After 10 years together, we are excited to celebrate our wedding
-            with our most cherished family and friends. Our wedding is inspired
-            Muriel's Wedding, so expect surprises, melodrama and maximalism.
-
-            As they say, to be forewarned is to be forearmed.
+            We are so excited to celebrate our wedding in Melbourne, Australia,
+            with our most cherished family and friends. Our relationship began
+            on a dancefloor 10 years ago, and boogying the night away is
+            something that we still love to do together. So please bring your
+            dancing shoes, your best/worst singing voice, an adventurous spirit
+            and appetite for surprise twists. We can&apos;t wait to marry you!
           </p>
         </div>
       </div>

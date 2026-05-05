@@ -5,6 +5,7 @@ import Details from "@/components/Details";
 import MoodBoard from "@/components/MoodBoard";
 import Gift from "@/components/Gift";
 import Travel from "@/components/Travel";
+import Faqs from "@/components/Faqs";
 import Notes from "@/components/Notes";
 import Footer from "@/components/Footer";
 import Sticker from "@/components/Sticker";
@@ -88,18 +89,19 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       <Navbar showNotes={!!invitee} />
       <ScatteredStickers />
       <main className="pt-12 relative z-10">
-        <Hero />
-        <OurStory code={invitee?.code ?? null} />
-        <Details
+        <Hero
           invitee={invitee}
           invalidCode={invalidCode}
           existingRsvp={existingRsvp}
           rsvpClosed={rsvpClosed}
           deadlineLabel={deadlineLabel}
         />
+        <OurStory code={invitee?.code ?? null} />
+        <Details />
         <MoodBoard />
         {invitee && <Gift />}
         <Travel />
+        <Faqs />
         {invitee && (
           <Notes
             notes={notes}

@@ -33,13 +33,14 @@ export default async function MoodBoard() {
           Dress code
         </h2>
         <p className="font-headline font-extrabold text-xl md:text-2xl text-on-surface mb-6">
-          Dress code: formal.
+          Dress code: cocktail.
         </p>
         <p className="text-lg md:text-xl text-on-surface-variant leading-relaxed">
           Wear whatever sets your soul on fire, whether it be your Sunday best
-          or a white wedding dress (we won’t be, so you won’t upstage us). We
-          want you to feel confident, but if you need some inspo, we love bright
-          colours and bold patterns. Check out our mood board below.
+          or a white wedding dress (we won’t be, so don’t worry about upstaging
+          us). We want you to feel confident, but if you need some inspo, we
+          love bright colours and bold patterns. Check out our mood board
+          below.
         </p>
       </div>
 

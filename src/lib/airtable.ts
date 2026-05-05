@@ -465,26 +465,3 @@ export function isPastDeadline(deadline: Date | null, now: Date = new Date()): b
   return now.getTime() > deadline.getTime();
 }
 
-export async function createInvitee(input: {
-  code: string;
-  household: string;
-  maxPartySize: number;
-}): Promise<Invitee> {
-  const table = env("AIRTABLE_INVITEES_TABLE");
-  const fields: InviteeFields = {
-    Code: input.code,
-    Household: input.household,
-    "Max party size": input.maxPartySize,
-  };
-  const response = await airtableFetch(tableUrl(table), {
-    method: "POST",
-    body: JSON.stringify({ fields }),
-  });
-  const data = (await response.json()) as AirtableRecord<InviteeFields>;
-  return {
-    id: data.id,
-    code: data.fields.Code,
-    household: data.fields.Household,
-    maxPartySize: data.fields["Max party size"] ?? input.maxPartySize,
-  };
-}

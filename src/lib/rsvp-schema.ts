@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const INVITE_CODE_REGEX = /^[0-9A-Z]{6}$/;
-export const INVITE_CODE_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 const optionalString = (max: number) =>
   z.string().trim().max(max).optional().or(z.literal(""));

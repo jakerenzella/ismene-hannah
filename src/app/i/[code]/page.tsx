@@ -33,7 +33,7 @@ export async function generateMetadata({
     ? `Hey ${household}, you're invited to Ismene + Hannah's wedding`
     : "You're invited to Ismene + Hannah's wedding";
   const description =
-    "27 February 2027 in Melbourne — tap through to RSVP and see all the details.";
+    "27 February 2027 in Melbourne. Tap through to RSVP and see all the details.";
 
   // Reuse the root opengraph-image.jpg convention file so invite previews
   // share the same visual treatment as the homepage. Setting an explicit

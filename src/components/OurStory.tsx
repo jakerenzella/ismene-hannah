@@ -38,7 +38,7 @@ export default function OurStory() {
           </div>
           <p
             className="text-[1.3rem] md:text-[1.8rem] lg:text-[2.4rem] leading-[115%] text-on-surface-variant mb-12 px-4"
-            style={{ fontFamily: "'Esteban', serif", letterSpacing: "-0.05em" }}
+            style={{ fontFamily: "var(--font-esteban), serif", letterSpacing: "-0.05em" }}
           >
             We are so excited to celebrate our wedding in Melbourne, Australia,
             with our most cherished family and friends. Our relationship began

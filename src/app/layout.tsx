@@ -1,5 +1,31 @@
 import type { Metadata } from "next";
+import { Caveat, Esteban, Plus_Jakarta_Sans, Work_Sans } from "next/font/google";
 import "./globals.css";
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-plus-jakarta",
+});
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-caveat",
+});
+
+const workSans = Work_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-work-sans",
+});
+
+const esteban = Esteban({
+  subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+  variable: "--font-esteban",
+});
 
 const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
@@ -20,13 +46,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const fontVariables = `${plusJakarta.variable} ${caveat.variable} ${workSans.variable} ${esteban.variable}`;
   return (
-    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      className={`scroll-smooth ${fontVariables}`}
+      data-scroll-behavior="smooth"
+    >
       <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Esteban:wght@400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap"
-          rel="stylesheet"
-        />
+        {/* Material Symbols is an icon font; not in next/font/google's catalog. */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"

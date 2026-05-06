@@ -13,7 +13,7 @@ export default function ScatteredStickers() {
 
       {/* Heart — absolute right side, mid-page */}
       <div
-        className="absolute top-[800px] -right-4 opacity-40 pointer-events-none z-0 sticker-float"
+        className="absolute top-[800px] right-0 md:-right-4 opacity-40 pointer-events-none z-0 sticker-float"
         style={{ "--sticker-rotate": "-10deg" } as React.CSSProperties}
       >
         <Image src="/assets/heart_2.svg" alt="" width={96} height={96} className="w-24 h-auto" />

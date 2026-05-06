@@ -60,7 +60,7 @@ export default function Hero({ invitee, invalidCode, existingRsvp, rsvpClosed, d
           </div>
 
           {/* Decorative heart */}
-          <div className="absolute -top-10 -right-10 z-20">
+          <div className="absolute -top-4 -right-2 md:-top-10 md:-right-10 z-20">
             <Sticker
               src="/assets/heart.svg"
               width={96}

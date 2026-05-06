@@ -109,6 +109,12 @@
 html,
 body {
   overflow-x: clip;
+  overscroll-behavior-x: none;
+  width: 100%;
+}
+
+body {
+  position: relative;
 }
 
 html {

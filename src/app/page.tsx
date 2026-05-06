@@ -90,7 +90,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       <Navbar showNotes={!!invitee} />
       <ScrollToTopOnMount />
       <ScatteredStickers />
-      <main className="pt-12 relative z-10">
+      <main className="pt-12 relative z-10 overflow-x-clip">
         <Hero
           invitee={invitee}
           invalidCode={invalidCode}

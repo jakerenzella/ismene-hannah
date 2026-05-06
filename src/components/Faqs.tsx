@@ -236,13 +236,13 @@ export default function Faqs() {
             key={question}
             className="group bg-surface-container-lowest scrapbook-shadow rounded-2xl border border-primary-container/20 overflow-hidden"
           >
-            <summary className="flex items-center justify-between gap-4 cursor-pointer list-none px-5 md:px-6 py-4 hover:bg-primary-container/10 transition-colors">
+            <summary className="flex items-center justify-between gap-4 list-none px-5 md:px-6 py-4 hover:bg-primary-container/10 transition-colors">
               <span className="font-headline font-extrabold text-base md:text-lg text-on-surface">
                 {question}
               </span>
               <span
                 aria-hidden="true"
-                className="material-symbols-outlined text-primary text-2xl leading-none transition-transform group-open:rotate-180"
+                className="material-symbols-outlined text-primary text-2xl leading-none transition-transform group-open:rotate-180 select-none"
               >
                 expand_more
               </span>

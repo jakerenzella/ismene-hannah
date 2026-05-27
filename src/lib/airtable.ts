@@ -166,22 +166,15 @@ export async function getNotes(myInviteeId: string | null = null): Promise<Note[
   }));
 }
 
-const fetchNoteCountForInvitee = async (inviteeId: string): Promise<number> => {
-  const table = process.env.AIRTABLE_NOTES_TABLE;
-  if (!table) return 0;
-  const formula = encodeURIComponent(`AND(NOT({Hidden}), FIND("${inviteeId.replace(/"/g, "")}", ARRAYJOIN({Invitee})))`);
-  const url = `${tableUrl(table)}?filterByFormula=${formula}&pageSize=100&fields%5B%5D=Invitee`;
-  const response = await airtableFetch(url);
-  const data = (await response.json()) as { records: AirtableRecord<NoteFields>[] };
-  return data.records.length;
-};
-
-export const getNoteCountForInvitee = (inviteeId: string) =>
-  unstable_cache(
-    () => fetchNoteCountForInvitee(inviteeId),
-    ["note-count", inviteeId],
-    { tags: [`note-count:${inviteeId}`], revalidate: 86400 }
-  )();
+// Derived from the cached notes list — both filter on NOT({Hidden}), so the
+// counts match. Removes a separate filterByFormula round-trip per note post.
+export async function getNoteCountForInvitee(inviteeId: string): Promise<number> {
+  const raw = await getNotesRaw();
+  return raw.reduce(
+    (n, note) => n + (note.linkedInviteeIds.includes(inviteeId) ? 1 : 0),
+    0
+  );
+}
 
 export async function createNote(
   inviteeId: string,
@@ -206,11 +199,12 @@ export async function createNote(
   return { ...rest, mine: linkedInviteeIds.includes(inviteeId) };
 }
 
+// Ownership is immutable, so reading from the cached list is always correct.
+// If the note isn't in the list, it's either hidden or already deleted — the
+// caller's downstream DELETE will surface any inconsistency.
 export async function getNoteOwnerInviteeId(noteId: string): Promise<string | null> {
-  const table = env("AIRTABLE_NOTES_TABLE");
-  const response = await airtableFetch(`${tableUrl(table)}/${noteId}`);
-  const data = (await response.json()) as AirtableRecord<NoteFields>;
-  return data.fields.Invitee?.[0] ?? null;
+  const raw = await getNotesRaw();
+  return raw.find((n) => n.id === noteId)?.linkedInviteeIds[0] ?? null;
 }
 
 export async function deleteNote(noteId: string): Promise<void> {
@@ -224,22 +218,26 @@ const REACTION_FIELD: Record<ReactionType, "Heart count" | "Sparkle count" | "La
   laugh: "Laugh count",
 };
 
+// Reads the current count from the cached notes list instead of an extra
+// per-record GET — Airtable has no atomic increment, so concurrent reactions
+// still race, but the race is no wider in practice than the previous
+// GET-then-PATCH path and acceptable at wedding-site scale.
 export async function adjustNoteReaction(
   noteId: string,
   type: ReactionType,
   delta: number
 ): Promise<void> {
   if (delta === 0) return;
-  const table = env("AIRTABLE_NOTES_TABLE");
-  const url = `${tableUrl(table)}/${noteId}`;
-  const getRes = await airtableFetch(url);
-  const data = (await getRes.json()) as AirtableRecord<NoteFields>;
-  const field = REACTION_FIELD[type];
-  const current = data.fields[field] ?? 0;
+  const raw = await getNotesRaw();
+  const note = raw.find((n) => n.id === noteId);
+  if (!note) return;
+  const current =
+    type === "heart" ? note.hearts : type === "sparkle" ? note.sparkles : note.laughs;
   const next = Math.max(0, current + delta);
-  await airtableFetch(url, {
+  const table = env("AIRTABLE_NOTES_TABLE");
+  await airtableFetch(`${tableUrl(table)}/${noteId}`, {
     method: "PATCH",
-    body: JSON.stringify({ fields: { [field]: next } }),
+    body: JSON.stringify({ fields: { [REACTION_FIELD[type]]: next } }),
   });
 }
 

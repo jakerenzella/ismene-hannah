@@ -98,7 +98,6 @@ export async function postNote(_prev: NoteFormState, formData: FormData): Promis
       color: payload.color,
     });
     updateTag("notes");
-    updateTag(`note-count:${invitee.id}`);
     return { status: "ok", note };
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
@@ -128,7 +127,6 @@ export async function deleteNoteAction(noteId: string, code: string): Promise<De
     if (owner !== invitee.id) return { ok: false, reason: "NOT_OWNER" };
     await deleteNote(noteId);
     updateTag("notes");
-    updateTag(`note-count:${invitee.id}`);
     return { ok: true };
   } catch (error) {
     console.error("[notes] delete failed", { error, noteId });

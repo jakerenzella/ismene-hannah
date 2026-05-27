@@ -262,13 +262,14 @@ describe("Notes", () => {
     });
   });
 
-  it("counts non-hidden notes for an invitee", async () => {
+  it("counts non-hidden notes for an invitee from the cached notes list", async () => {
     mockFetchSequence([
       {
         body: {
           records: [
             { id: "rec_note_1", fields: { Invitee: ["rec_invitee_1"] } },
             { id: "rec_note_2", fields: { Invitee: ["rec_invitee_1"] } },
+            { id: "rec_note_3", fields: { Invitee: ["rec_invitee_other"] } },
           ],
         },
       },
@@ -314,15 +315,79 @@ describe("Notes", () => {
 
   it("increments a reaction counter, never going below zero", async () => {
     const fetchMock = mockFetchSequence([
-      { body: { id: "rec_note_1", fields: { "Heart count": 0 } } },
+      {
+        body: {
+          records: [
+            {
+              id: "rec_note_1",
+              fields: { Invitee: ["rec_invitee_1"], "Heart count": 0 },
+            },
+          ],
+        },
+      },
       { body: { id: "rec_note_1", fields: {} } },
     ]);
     const { adjustNoteReaction } = await import("./airtable");
     await adjustNoteReaction("rec_note_1", "heart", -1);
     const patchInit = fetchMock.mock.calls[1][1] as RequestInit;
+    expect(patchInit.method).toBe("PATCH");
     expect(JSON.parse(patchInit.body as string)).toEqual({
       fields: { "Heart count": 0 },
     });
+  });
+
+  it("PATCHes only — current count comes from the cached notes list, no per-record GET", async () => {
+    const fetchMock = mockFetchSequence([
+      {
+        body: {
+          records: [
+            {
+              id: "rec_note_1",
+              fields: { Invitee: ["rec_invitee_1"], "Sparkle count": 4 },
+            },
+          ],
+        },
+      },
+      { body: { id: "rec_note_1", fields: {} } },
+    ]);
+    const { adjustNoteReaction } = await import("./airtable");
+    await adjustNoteReaction("rec_note_1", "sparkle", 1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    // First call is the notes-list fetch (sorted, filtered), not a single-record GET.
+    const listUrl = fetchMock.mock.calls[0][0] as string;
+    expect(listUrl).toContain("filterByFormula");
+    expect(listUrl).not.toMatch(/\/rec_note_1(\?|$)/);
+    const patchInit = fetchMock.mock.calls[1][1] as RequestInit;
+    expect(patchInit.method).toBe("PATCH");
+    expect(JSON.parse(patchInit.body as string)).toEqual({
+      fields: { "Sparkle count": 5 },
+    });
+  });
+
+  it("skips the PATCH when the note isn't in the visible list", async () => {
+    const fetchMock = mockFetchSequence([
+      { body: { records: [] } },
+    ]);
+    const { adjustNoteReaction } = await import("./airtable");
+    await adjustNoteReaction("rec_missing", "heart", 1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("reads ownership from the cached notes list, not a single-record GET", async () => {
+    const fetchMock = mockFetchSequence([
+      {
+        body: {
+          records: [
+            { id: "rec_note_1", fields: { Invitee: ["rec_invitee_1"] } },
+          ],
+        },
+      },
+    ]);
+    const { getNoteOwnerInviteeId } = await import("./airtable");
+    expect(await getNoteOwnerInviteeId("rec_note_1")).toBe("rec_invitee_1");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const url = fetchMock.mock.calls[0][0] as string;
+    expect(url).toContain("filterByFormula");
   });
 });
 

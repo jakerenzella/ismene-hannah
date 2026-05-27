@@ -71,47 +71,6 @@ const FAQS: Faq[] = [
     ),
   },
   {
-    question: "Do you have a gift registry?",
-    answer: (
-      <p>
-        Your presence at our wedding means a lot to us, and we don&apos;t
-        expect any gifts. More than half of you are travelling from
-        interstate/overseas and we really appreciate the effort and cost
-        involved to make this happen. If you do want to contribute something,
-        you can transfer to{" "}
-        <span className="font-headline font-bold text-on-surface">
-          PAY ID: 0490923671
-        </span>
-        , but don&apos;t feel like you need to.
-      </p>
-    ),
-  },
-  {
-    question: "What's the dress code?",
-    answer: (
-      <p>
-        Cocktail. Bright colours and loud prints are encouraged. Check out our{" "}
-        <a
-          href="#moodboard"
-          className="text-primary underline decoration-primary/40 hover:decoration-primary"
-        >
-          mood board
-        </a>{" "}
-        for more info.
-      </p>
-    ),
-  },
-  {
-    question: "Will the wedding be indoors or outdoors?",
-    answer: (
-      <p>
-        The ceremony will be outdoors, and the reception will be indoors. Late
-        summer in Melbourne can vary weatherwise but let&apos;s collectively
-        manifest a sunny, cloudless day (between 20-26 degrees).
-      </p>
-    ),
-  },
-  {
     question: "Can I bring a plus one?",
     answer: (
       <p>
@@ -149,21 +108,13 @@ const FAQS: Faq[] = [
   {
     question: "Are the wedding venue(s) wheelchair accessible?",
     answer: (
-      <div className="space-y-3">
-        <p>
-          No, they are not. The ceremony at Ceres is in an urban farm which
-          has gravel roads and is a 5 min walk from the street to the ceremony
-          location. If you have access requirements, you can be driven
-          directly to the ceremony, please let us know and we can talk you
-          through it. At the reception, there are two flights of stairs and no
-          lift.
-        </p>
-        <p>
-          Although this wedding is not wheelchair accessible, we will do our
-          best to make it accessible to the non-English speakers in
-          attendance, especially our French guests. On vous soutient!
-        </p>
-      </div>
+      <p>
+        No, they are not. The ceremony at Ceres is in an urban farm which has
+        gravel roads and is a 5 min walk from the street to the ceremony
+        location. If you have access requirements, you can be driven directly
+        to the ceremony, please let us know and we can talk you through it. At
+        the reception, there are two flights of stairs and no lift.
+      </p>
     ),
   },
   {
@@ -173,33 +124,6 @@ const FAQS: Faq[] = [
         We are having a professional photographer, so no photos necessary. If
         you can bear it, keep your camera/iPad in your pocket until the
         reception.
-      </p>
-    ),
-  },
-  {
-    question: "Are kids invited?",
-    answer: (
-      <p>
-        Yes! If you have kid/s, their names will be included on your invite.
-      </p>
-    ),
-  },
-  {
-    question: "Will there be dancing?",
-    answer: (
-      <p>
-        The ceremony, the speeches and the meals are all a lead up to the
-        dancefloor. We hope that you can join us at the afterparty too, where
-        the dancing will continue until late.
-      </p>
-    ),
-  },
-  {
-    question: "But you're both so short and look like children.",
-    answer: (
-      <p>
-        We swear, we&apos;re not! For those that keep asking if we&apos;re
-        related, no comment.
       </p>
     ),
   },
@@ -253,12 +177,6 @@ export default function Faqs() {
           </details>
         ))}
       </div>
-
-      <p className="mt-10 text-center text-on-surface-variant text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-        If your question hasn&apos;t been answered, contact us! If you want to
-        talk about dogs, contact Hannah! If you&apos;ve got a secret you want
-        to get off your chest, contact Ismene!
-      </p>
     </section>
   );
 }

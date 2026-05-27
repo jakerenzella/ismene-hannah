@@ -3,7 +3,6 @@ import Hero from "@/components/Hero";
 import OurStory from "@/components/OurStory";
 import Details from "@/components/Details";
 import MoodBoard from "@/components/MoodBoard";
-import Gift from "@/components/Gift";
 import Travel from "@/components/Travel";
 import Faqs from "@/components/Faqs";
 import Notes from "@/components/Notes";
@@ -101,7 +100,6 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         <OurStory />
         <Details />
         <MoodBoard />
-        {invitee && <Gift />}
         <Travel />
         <Faqs />
         {invitee && (
